@@ -51,11 +51,13 @@ public class UserDTO {
 
     private Set<String> authorities;
 
+    private String uuid;
+
     public UserDTO() {
         // Empty constructor needed for Jackson.
     }
 
-    public UserDTO(Long id, String login, String firstName, String lastName, String email, String imageUrl, boolean activated, String langKey, String createdBy, Instant createdDate, String lastModifiedBy, Instant lastModifiedDate, Set<String> authorities) {
+    public UserDTO(Long id, String login, String firstName, String lastName, String email, String imageUrl, boolean activated, String langKey, String createdBy, Instant createdDate, String lastModifiedBy, Instant lastModifiedDate, Set<String> authorities, String uuid) {
         this.id = id;
         this.login = login;
         this.firstName = firstName;
@@ -69,6 +71,7 @@ public class UserDTO {
         this.lastModifiedBy = lastModifiedBy;
         this.lastModifiedDate = lastModifiedDate;
         this.authorities = authorities;
+        this.uuid = uuid;
     }
 
     public UserDTO(User user) {
@@ -115,6 +118,14 @@ public class UserDTO {
         this.login = login;
     }
 
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
     public String getFirstName() {
         return firstName;
     }
@@ -137,6 +148,50 @@ public class UserDTO {
 
     public String getLangKey() {
         return langKey;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+
+
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public void setActivated(boolean activated) {
+        this.activated = activated;
+    }
+
+
+    public void setLangKey(String langKey) {
+        this.langKey = langKey;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public void setCreatedDate(Instant createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public void setAuthorities(Set<String> authorities) {
+        this.authorities = authorities;
     }
 
     public String getCreatedBy() {

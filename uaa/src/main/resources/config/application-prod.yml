@@ -41,10 +41,16 @@ spring:
             hibernate.cache.use_query_cache: false
             hibernate.generate_statistics: false
     mail:
-        host: localhost
-        port: 25
-        username:
-        password:
+        host: smtp.gmail.com
+        port: 587
+        username: ismailzakky@gmail.com
+        password: ifpewhvruyacrcvo
+        protocol: smtp
+        tls: true
+        properties.mail.smtp:
+            auth: true
+            starttls.enable: true
+            ssl.trust: smtp.gmail.com
     thymeleaf:
         cache: true
     zipkin: # Use the "zipkin" Maven profile to have the Spring Cloud Zipkin dependencies
@@ -53,6 +59,27 @@ spring:
         locator:
             discovery:
                 enabled: true
+    cloud:
+        stream:
+            bindings:
+                fileOutput:
+                    destination: file
+                    binder: rabbitmqserver
+                    contentType: application/x-java-serialized-object
+                salonInput:
+                    destination: index
+                    binder: rabbitmqserver
+                    contentType: application/x-java-serialized-object
+            binders:
+                rabbitmqserver:
+                    type: rabbit
+                    environment:
+                        spring:
+                            rabbitmq:
+                                addresses: elephant.rmq.cloudamqp.com
+                                username: dxikxozh
+                                password: qbTbnhBbUkz5F0WIKjKR602qitA8vNT5
+                                virtual-host: dxikxozh
 
 liquibase:
     contexts: prod
@@ -96,9 +123,6 @@ jhipster:
         client-authorization:
             client-id: internal
             client-secret: internal
-    mail: # specific JHipster mail property, for standard properties see MailProperties
-        from: uaa@localhost
-        base-url: http://my-server-url-to-change # Modify according to your server's URL
     metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
         jmx.enabled: true
         graphite:
@@ -118,6 +142,7 @@ jhipster:
             host: localhost
             port: 5000
             queue-size: 512
+
 
 # ===================================================================
 # Application specific properties

@@ -99,7 +99,8 @@ public class User extends AbstractAuditingEntity implements Serializable {
     public User() {
     }
 
-    public User(String uuid, String login, String password, String firstName, String lastName, String email, boolean activated, String langKey, String imageUrl, String activationKey, String resetKey, Instant resetDate, Set<Authority> authorities) {
+    public User(Long id,String uuid, String login, String password, String firstName, String lastName, String email, boolean activated, String langKey, String imageUrl, String activationKey, String resetKey, Instant resetDate, Set<Authority> authorities) {
+        this.id = id;
         this.uuid = uuid;
         this.login = login;
         this.password = password;
@@ -154,6 +155,10 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public boolean isActivated() {
+        return activated;
     }
 
     public String getEmail() {

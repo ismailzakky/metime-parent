@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -141,10 +142,14 @@ public class UserResource {
             HeaderUtil.createAlert("A user is updated with identifier " + managedUserVM.getLogin(), managedUserVM.getLogin()));
     }
 
+
+    @PutMapping("/usersImage")
+    @Timed
     public ResponseEntity<UserDTO> updateUserProfileImage(@RequestParam("param") String param, @Valid @RequestParam("file") MultipartFile multipartFile){
 
         Boolean userChangeSubmited = false;
         ManagedUserVM managedUserVM = null;
+        String restMessage = "A user is upated with identifier" + managedUserVM.getLogin();
         try{
             managedUserVM = new ObjectMapper().readValue(param, ManagedUserVM.class);
             userChangeSubmited = true;
@@ -152,14 +157,20 @@ public class UserResource {
             e.printStackTrace();
             userChangeSubmited = false;
         }
-        Optional<UserDTO> updatedUser;
+        Optional<UserDTO> updatedUser = null;
         if(userChangeSubmited){
-            updatedUser = userService.updateUserImage(managedUserVM,multipartFile,userChangeSubmited);
-        } else {
+            try {
+                updatedUser = userService.updateUserImage(managedUserVM,multipartFile,userChangeSubmited);
+            } catch (IOException e) {
+                e.printStackTrace();
+                updatedUser = null;
+                restMessage = "Update Data Failed";
+            }
+        } /*else {
             updatedUser = userService.updateUserImage(null,multipartFile,userChangeSubmited);
-        }
+        }*/
 
-        return ResponseUtil.wrapOrNotFound(updatedUser,HeaderUtil.createAlert("A user is upated with identifier" + managedUserVM.getLogin(), managedUserVM.getLogin()));
+        return ResponseUtil.wrapOrNotFound(updatedUser,HeaderUtil.createAlert(restMessage, managedUserVM.getLogin()));
 
     }
 

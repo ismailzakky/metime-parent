@@ -78,7 +78,12 @@ public class AuditEventConverter {
                     results.put("remoteAddress", authenticationDetails.getRemoteAddress());
                     results.put("sessionId", authenticationDetails.getSessionId());
                 } else if (object != null) {
-                    results.put(entry.getKey(), object.toString());
+                    if (object.toString().length() > 255){
+
+                    } else {
+                        results.put(entry.getKey(), object.toString());
+                    }
+
                 } else {
                     results.put(entry.getKey(), "null");
                 }

@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.Set;
 
 public class UserBuilder {
+    private Long id;
     private String uuid;
     private String login;
     private String password;
@@ -20,6 +21,11 @@ public class UserBuilder {
     private String resetKey;
     private Instant resetDate;
     private Set<Authority> authorities;
+
+    public UserBuilder setId(Long id) {
+        this.id = id;
+        return this;
+    }
 
     public UserBuilder setUuid(String uuid) {
         this.uuid = uuid;
@@ -87,6 +93,6 @@ public class UserBuilder {
     }
 
     public User createUser() {
-        return new User(uuid, login, password, firstName, lastName, email, activated, langKey, imageUrl, activationKey, resetKey, resetDate, authorities);
+        return new User(id, uuid, login, password, firstName, lastName, email, activated, langKey, imageUrl, activationKey, resetKey, resetDate, authorities);
     }
 }

@@ -1,4 +1,4 @@
-package com.cus.metime.promosi.util;
+package com.cus.metime.shared.util;
 
 import java.security.SecureRandom;
 import java.util.Locale;

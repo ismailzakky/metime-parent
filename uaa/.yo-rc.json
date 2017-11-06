@@ -1,0 +1,33 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "com.cus.salon.uaa"
+    },
+    "jhipsterVersion": "4.8.2",
+    "baseName": "uaa",
+    "packageName": "com.cus.salon.uaa",
+    "packageFolder": "com/cus/salon/uaa",
+    "serverPort": "9901",
+    "authenticationType": "uaa",
+    "hibernateCache": "no",
+    "clusteredHttpSession": false,
+    "websocket": false,
+    "databaseType": "sql",
+    "devDatabaseType": "postgresql",
+    "prodDatabaseType": "postgresql",
+    "searchEngine": false,
+    "messageBroker": false,
+    "serviceDiscoveryType": "eureka",
+    "buildTool": "maven",
+    "enableSocialSignIn": false,
+    "enableSwaggerCodegen": false,
+    "jwtSecretKey": "9224864d5c42e10766ab93b6ccc3b42bce73e00a",
+    "enableTranslation": false,
+    "applicationType": "uaa",
+    "testFrameworks": [],
+    "jhiPrefix": "jhi",
+    "skipClient": true,
+    "clientPackageManager": "yarn",
+    "herokuAppName": "metime-uaa"
+  }
+}

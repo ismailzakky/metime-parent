@@ -1,5 +1,8 @@
 package com.cus.metime.uaa.service;
 
+import com.cus.metime.shared.messaging.MessageEvent;
+import com.cus.metime.shared.util.RandomString;
+import com.cus.metime.uaa.assembler.UserToUserDTOAssembler;
 import com.cus.metime.uaa.config.Constants;
 import com.cus.metime.uaa.domain.Authority;
 import com.cus.metime.uaa.domain.User;
@@ -20,9 +23,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 /**
@@ -40,10 +45,16 @@ public class UserService {
 
     private final AuthorityRepository authorityRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository) {
+    private final AssyncMessagingService assyncMessagingService;
+
+    private final UserToUserDTOAssembler userToUserDTOAssembler;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository, UserToUserDTOAssembler userToUserDTOAssembler, AssyncMessagingService assyncMessagingService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
+        this.assyncMessagingService = assyncMessagingService;
+        this.userToUserDTOAssembler = userToUserDTOAssembler;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -171,7 +182,7 @@ public class UserService {
                 user.setFirstName(userDTO.getFirstName());
                 user.setLastName(userDTO.getLastName());
                 user.setEmail(userDTO.getEmail());
-                //user.setImageUrl(userDTO.getImageUrl());
+                user.setImageUrl(userDTO.getImageUrl());
                 user.setActivated(userDTO.isActivated());
                 user.setLangKey(userDTO.getLangKey());
                 Set<Authority> managedAuthorities = user.getAuthorities();
@@ -185,15 +196,33 @@ public class UserService {
             .map(UserDTO::new);
     }
 
-    public Optional<UserDTO> updateUserImage(UserDTO userDTO, MultipartFile multipartFile, Boolean userChangeSubmited) {
+    public Optional<UserDTO> updateUserImage(UserDTO userDTO, MultipartFile multipartFile, Boolean userChangeSubmited) throws IOException {
 
-
-        Optional<User> user = Optional.of(userRepository.findOne(userDTO.getId()));
+        Boolean successSaving = false;
+        Optional<UserDTO> updatedUserDTO = null;
         if(userChangeSubmited){
-            //user = updateUser(userDTO);
+            updatedUserDTO = updateUser(userDTO);
         }
 
-        return null;
+        if(updatedUserDTO.isPresent()){
+            RandomString randomString = new RandomString(10, ThreadLocalRandom.current());
+            String fileName = randomString.nextString();
+            updatedUserDTO.get().setImageUrl(fileName);
+
+            try{
+                userRepository.save(userToUserDTOAssembler.toDomain(updatedUserDTO.get()));
+                successSaving = true;
+            } catch (Exception e){
+                successSaving = false;
+            } finally {
+                if(successSaving){
+                    assyncMessagingService.sendImageFile(multipartFile,fileName,userToUserDTOAssembler.toDomain(updatedUserDTO.get()), MessageEvent.CREATE);
+                }
+            }
+        }
+
+
+        return updatedUserDTO;
 
     }
 

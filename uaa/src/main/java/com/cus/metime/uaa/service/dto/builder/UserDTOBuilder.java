@@ -24,6 +24,7 @@ public class UserDTOBuilder {
     private Instant lastModifiedDate = user.getLastModifiedDate();
     private Set<String> authorities = user.getAuthorities().stream().map(Authority::getName)
         .collect(Collectors.toSet());
+    private String uuid;
 
 
     public UserDTOBuilder setId(Long id) {
@@ -91,12 +92,17 @@ public class UserDTOBuilder {
         return this;
     }
 
+    public UserDTOBuilder setUuid(String uuid) {
+        this.uuid = uuid;
+        return this;
+    }
+
     public UserDTOBuilder setUser(User user) {
         this.user = user;
         return this;
     }
 
     public UserDTO createUserDTO() {
-        return new UserDTO(id, login, firstName, lastName, email, imageUrl, activated, langKey, createdBy, createdDate, lastModifiedBy, lastModifiedDate, authorities);
+        return new UserDTO(id, login, firstName, lastName, email, imageUrl, activated, langKey, createdBy, createdDate, lastModifiedBy, lastModifiedDate, authorities, uuid);
     }
 }

@@ -10,7 +10,7 @@ import com.cus.metime.promosi.repository.PromoRepository;
 import com.cus.metime.promosi.security.SecurityUtils;
 import com.cus.metime.promosi.service.AssyncMessagingService;
 import com.cus.metime.promosi.service.PromoService;
-import com.cus.metime.promosi.util.RandomString;
+import com.cus.metime.shared.util.RandomString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

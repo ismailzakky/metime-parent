@@ -5,7 +5,6 @@ import com.cus.metime.salon.domain.Service;
 import com.cus.metime.salon.repository.ServiceRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -13,7 +12,7 @@ import java.util.List;
 /**
  * Service Implementation for managing Service.
  */
-@Service
+@org.springframework.stereotype.Service
 @Transactional
 public class ServiceServiceImpl implements ServiceService{
 
