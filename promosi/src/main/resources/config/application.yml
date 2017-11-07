@@ -74,22 +74,12 @@ spring:
                     destination: file
                     binder: rabbitmqserver
                     contentType: application/x-java-serialized-object
+                    group: fileOutputGroup
                 indexOutput:
                     destination: index
                     binder: rabbitmqserver
                     contentType: application/x-java-serialized-object
-                fileInput:
-                    destination: file
-                    binder: rabbitmqserver
-                    contentType: application/x-java-serialized-object
-                    durableSubscription: true
-                    group: fileInputGroup
-                indexInput:
-                    destination: index
-                    binder: rabbitmqserver
-                    contentType: application/x-java-serialized-object
-                    durableSubscription: true
-                    group: indexInputGroup
+                    group: indexOutputGroup
             binders:
                 rabbitmqserver:
                     type: rabbit

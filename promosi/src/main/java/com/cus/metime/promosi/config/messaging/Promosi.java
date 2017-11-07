@@ -18,10 +18,4 @@ public interface Promosi extends Sink,Source {
     @Output
     MessageChannel indexOutput();
 
-    @Input
-    SubscribableChannel fileInput();
-
-    @Input
-    SubscribableChannel indexInput();
-
 }

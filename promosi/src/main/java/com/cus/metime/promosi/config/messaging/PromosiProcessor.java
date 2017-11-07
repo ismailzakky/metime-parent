@@ -1,7 +1,7 @@
 package com.cus.metime.promosi.config.messaging;
 
-import com.cus.metime.promosi.dto2.EventWrapperDTO;
-import com.cus.metime.promosi.dto2.FileTransferDTO;
+import com.cus.metime.shared.messaging.EventWrapperDTO;
+import com.cus.metime.shared.messaging.filehandler.FileTransferDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.MessageEndpoint;
@@ -15,8 +15,8 @@ import java.util.Map;
 /**
  * Created by C-US on 9/25/2017.
  */
-@Configuration
-@MessageEndpoint
+//@Configuration
+//@MessageEndpoint
 public class PromosiProcessor {
 
     @ServiceActivator(inputChannel = "indexInput")

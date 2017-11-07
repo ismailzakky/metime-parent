@@ -2,9 +2,9 @@ package com.cus.metime.promosi.service;
 
 import com.cus.metime.promosi.config.messaging.Promosi;
 import com.cus.metime.promosi.domain.Promo;
-import com.cus.metime.promosi.dto.EventWrapperDTO;
-import com.cus.metime.promosi.dto.FileTransferDTO;
-import com.cus.metime.promosi.dto.MessageEvent;
+import com.cus.metime.shared.messaging.EventWrapperDTO;
+import com.cus.metime.shared.messaging.MessageEvent;
+import com.cus.metime.shared.messaging.filehandler.FileTransferDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
@@ -37,32 +37,21 @@ public class AssyncMessagingService {
         EventWrapperDTO eventWrapperDTO = new EventWrapperDTO();
         eventWrapperDTO.setMessage(promo);
         eventWrapperDTO.setEvent(event);
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map<String,Object> promoMap = objectMapper.convertValue(promo,Map.class);
-        Map<String,Object> eventMap = new HashMap();
-        eventMap.put("event",event.toString());
-        eventMap.put("message",promoMap);
 
-
-        Message<Map<String,Object>> eventWrapperDTOMessage = MessageBuilder.withPayload(eventMap).build();
-
-
-
+        Message<EventWrapperDTO> eventWrapperDTOMessage = MessageBuilder.withPayload(eventWrapperDTO).build();
         messageChannel.send(eventWrapperDTOMessage);
     }
 
     public void sendImageFile(MultipartFile multipartFile,String fileName,Promo promo,MessageEvent event) throws IOException {
         MessageChannel messageChannel = outputChannelSource.fileOutput();
         EventWrapperDTO eventWrapperDTO = new EventWrapperDTO();
-        ObjectMapper objectMapper = new ObjectMapper();
 
         FileTransferDTO fileTransferDTO = new FileTransferDTO(fileName,multipartFile.getBytes(),multipartFile.getOriginalFilename().split("\\.")[1],promo.getUuid());
         eventWrapperDTO.setEvent(event);
         eventWrapperDTO.setMessage(fileTransferDTO);
 
-        Map<String,Object> eventWrapperMap = objectMapper.convertValue(eventWrapperDTO,Map.class);
 
-        Message<Map<String,Object>> msg = MessageBuilder.withPayload(eventWrapperMap).build();
+        Message<EventWrapperDTO> msg = MessageBuilder.withPayload(eventWrapperDTO).build();
         messageChannel.send(msg);
     }
 

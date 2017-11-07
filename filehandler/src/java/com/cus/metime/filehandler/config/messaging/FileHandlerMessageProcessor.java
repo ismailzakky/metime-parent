@@ -4,10 +4,10 @@ import com.cus.metime.filehandler.domain.MediaFile;
 import com.cus.metime.filehandler.domain.builder.MediaFileBuilder;
 import com.cus.metime.filehandler.domain.embedable.builder.CreationalDateBuilder;
 import com.cus.metime.filehandler.domain.embedable.builder.FileSpecificationBuilder;
-import com.cus.metime.filehandler.dto.messaging.EventWrapperDTO;
-import com.cus.metime.filehandler.dto.messaging.FileTransferDTO;
-import com.cus.metime.filehandler.dto.messaging.MessageEvent;
 import com.cus.metime.filehandler.service.MediaFileService;
+import com.cus.metime.shared.messaging.EventWrapperDTO;
+import com.cus.metime.shared.messaging.MessageEvent;
+import com.cus.metime.shared.messaging.filehandler.FileTransferDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.sf.jmimemagic.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
-import sun.plugin2.message.EventMessage;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -66,31 +65,15 @@ public class FileHandlerMessageProcessor {
     public void fileInputProcessor(Message<byte[]> r) throws IOException, ClassNotFoundException {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        Map<String ,Object> eventWrapperDTOMap = objectMapper.convertValue(deserialize(r.getPayload()),Map.class);
-
-        EventWrapperDTO eventWrapperDTO = new EventWrapperDTO();
-        if(eventWrapperDTOMap.get("event").toString() == "DELETE"){
-            eventWrapperDTO.setEvent(MessageEvent.DELETE);
-        } else if(eventWrapperDTOMap.get("event").toString() == "UPDATE"){
-            eventWrapperDTO.setEvent(MessageEvent.UPDATE);
-        } else if(eventWrapperDTOMap.get("event").toString() == "CREATE"){
-            eventWrapperDTO.setEvent(MessageEvent.CREATE);
-        }
-
-        eventWrapperDTO.setMessage(eventWrapperDTOMap.get("message"));
-
-
-        Map<String,Object> map = objectMapper.convertValue(eventWrapperDTO.getMessage(),Map.class);
+        EventWrapperDTO eventWrapperDTO = objectMapper.convertValue(deserialize(r.getPayload()),EventWrapperDTO.class);
+        FileTransferDTO fileTransferDTO = objectMapper.convertValue(eventWrapperDTO.getMessage(),FileTransferDTO.class);
 
 
         MediaFile mediaFile = new MediaFileBuilder().createMediaFile();
-        if(eventWrapperDTOMap.get("event").toString() == "DELETE"){
+        if(eventWrapperDTO.getEvent().toString() == MessageEvent.DELETE.toString()){
             System.out.println("DELETE FILE AND DATA");
         } else {
-            FileTransferDTO fileTransferDTO = new FileTransferDTO();
-            fileTransferDTO.setFileExtension((String) map.get("fileExtension"));
-            fileTransferDTO.setFileName((String) map.get("fileName"));
-            fileTransferDTO.setFileStream((byte[]) map.get("fileStream"));
+
             byte[] file = fileTransferDTO.getFileStream();
             String fileName =  fileTransferDTO.getFileName();
             String fileExtension = fileTransferDTO.getFileExtension();
@@ -106,7 +89,7 @@ public class FileHandlerMessageProcessor {
             }
 
             mediaFileService.save(new MediaFileBuilder()
-                .setSegment((String)map.get("uuid"))
+                .setSegment((String)fileTransferDTO.getUuid())
                 .setUuid(UUID.randomUUID().toString())
                 .setCreationalDate(new CreationalDateBuilder()
                     .setModifiedBy("System")
@@ -115,8 +98,8 @@ public class FileHandlerMessageProcessor {
                     .setCreatedAt(LocalDateTime.now())
                     .createCreationalDate())
                 .setFileSpecification(new FileSpecificationBuilder()
-                    .setExtension((String)map.get("fileExtension"))
-                    .setFileName((String) map.get("fileName"))
+                    .setExtension(fileTransferDTO.getFileExtension())
+                    .setFileName(fileTransferDTO.getFileName())
                     .setMimeType(magicMatch != null ? magicMatch.getMimeType() : "")
                     .setOriginalSize( Float.parseFloat(String.valueOf(file.length)))
                     .createFileSpecification())
@@ -128,16 +111,16 @@ public class FileHandlerMessageProcessor {
                 byte[] bytes = file;
 
 
-                new File("D:/opt2/"+ map.get("uuid")).mkdirs();
+                new File("D:/opt2/"+ fileTransferDTO.getUuid()).mkdirs();
                 BufferedOutputStream stream =
-                    new BufferedOutputStream(new FileOutputStream(new File("D:/opt2/"+ map.get("uuid").toString() +"/" + fileName+"."+fileExtension)));
+                    new BufferedOutputStream(new FileOutputStream(new File("D:/opt2/"+ fileTransferDTO.getUuid() +"/" + fileName+"."+fileExtension)));
                 stream.write(bytes);
                 stream.close();
 
-                BufferedImage originalImage = ImageIO.read(new File("D:/opt2/"+ map.get("uuid").toString() +"/" + fileName+"."+fileExtension));
+                BufferedImage originalImage = ImageIO.read(new File("D:/opt2/"+ fileTransferDTO.getUuid() +"/" + fileName+"."+fileExtension));
                 int type = originalImage.getType() == 0? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
                 BufferedImage resizedImage = resizeImage(originalImage,type);
-                ImageIO.write(resizedImage, magicMatch != null ? magicMatch.getExtension() : "",new File("D:/opt2/"+ map.get("uuid").toString() +"/" + fileName+"_thumb"+"."+fileExtension));
+                ImageIO.write(resizedImage, magicMatch != null ? magicMatch.getExtension() : "",new File("D:/opt2/"+ fileTransferDTO.getUuid() +"/" + fileName+"_thumb"+"."+fileExtension));
                 System.out.println("You successfully uploaded " + name + " into " + name + "-uploaded !");
             }
         }
