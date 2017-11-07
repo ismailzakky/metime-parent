@@ -135,8 +135,25 @@ Desktop.ini
 # Maven Wrapper
 ######################
 !.mvn/wrapper/maven-wrapper.jar
+.mvn/
 
 ######################
 # ESLint
 ######################
 .eslintcache
+review.log.1
+review.log.2
+nbactions.xml
+src/main/resources/config/application-dev.yml
+src/main/resources/config/application-dev.yml
+src/main/resources/config/bootstrap.yml
+
+######################
+# Test
+######################
+src/test
+
+######################
+# Log
+######################
+*.log.*

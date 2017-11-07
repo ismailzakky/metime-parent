@@ -24,16 +24,33 @@ public class Review implements Serializable {
     @SequenceGenerator(name = "sequenceGenerator")
     private Long id;
 
-    @Column(name = "jhi_comment")
-    private String comment;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "rate")
     private Rate rate;
 
+    @Column(name = "comment")
+    private String comment;
+
+    @Column(name = "segment_1")
+    private String segment1;
+
     @OneToMany(mappedBy = "review")
-    @JsonIgnore
-    private Set<HelpFull> helpFullnesses = new HashSet<>();
+//    @JsonIgnore
+    private Set<HelpFull> helpFulnesses = new HashSet<>();
+    
+    @Embedded
+    private CreationalDate creationalDate;
+
+    public Review() {
+    }
+
+    public Review(Long id, Rate rate, String comment, String segment1, CreationalDate creationalDate) {
+        this.id = id;
+        this.rate = rate;
+        this.comment = comment;
+        this.segment1 = segment1;
+        this.creationalDate = creationalDate;
+    }
 
     // jhipster-needle-entity-add-field - Jhipster will add fields here, do not remove
     public Long getId() {
@@ -42,19 +59,6 @@ public class Review implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public Review comment(String comment) {
-        this.comment = comment;
-        return this;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
     }
 
     public Rate getRate() {
@@ -70,30 +74,66 @@ public class Review implements Serializable {
         this.rate = rate;
     }
 
-    public Set<HelpFull> getHelpFullnesses() {
-        return helpFullnesses;
+    public String getComment() {
+        return comment;
     }
 
-    public Review helpFullnesses(Set<HelpFull> helpFulls) {
-        this.helpFullnesses = helpFulls;
+    public Review comment(String comment) {
+        this.comment = comment;
         return this;
     }
 
-    public Review addHelpFullness(HelpFull helpFull) {
-        this.helpFullnesses.add(helpFull);
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public String getSegment1() {
+        return segment1;
+    }
+
+    public Review segment1(String segment1) {
+        this.segment1 = segment1;
+        return this;
+    }
+
+    public void setSegment1(String segment1) {
+        this.segment1 = segment1;
+    }
+
+    public Set<HelpFull> getHelpFulnesses() {
+        return helpFulnesses;
+    }
+
+    public Review helpFulnesses(Set<HelpFull> helpFulls) {
+        this.helpFulnesses = helpFulls;
+        return this;
+    }
+
+    public Review addHelpFulness(HelpFull helpFull) {
+        this.helpFulnesses.add(helpFull);
         helpFull.setReview(this);
         return this;
     }
 
-    public Review removeHelpFullness(HelpFull helpFull) {
-        this.helpFullnesses.remove(helpFull);
+    public Review removeHelpFulness(HelpFull helpFull) {
+        this.helpFulnesses.remove(helpFull);
         helpFull.setReview(null);
         return this;
     }
 
-    public void setHelpFullnesses(Set<HelpFull> helpFulls) {
-        this.helpFullnesses = helpFulls;
+    public void setHelpFulnesses(Set<HelpFull> helpFulls) {
+        this.helpFulnesses = helpFulls;
     }
+
+    public CreationalDate getCreationalDate() {
+        return creationalDate;
+    }
+
+    public void setCreationalDate(CreationalDate creationalDate) {
+        this.creationalDate = creationalDate;
+    }
+    
+    
     // jhipster-needle-entity-add-getters-setters - Jhipster will add getters and setters here, do not remove
 
     @Override
@@ -120,8 +160,10 @@ public class Review implements Serializable {
     public String toString() {
         return "Review{" +
             "id=" + getId() +
-            ", comment='" + getComment() + "'" +
             ", rate='" + getRate() + "'" +
+            ", comment='" + getComment() + "'" +
+            ", segment1='" + getSegment1() + "'" +
+            ", creationalDate='" + getCreationalDate().toString()+ "'" +
             "}";
     }
 }

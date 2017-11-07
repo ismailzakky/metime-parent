@@ -1,0 +1,29 @@
+
+entity Review {
+	id String
+	rate Rate
+	comment String
+    segment1 String
+}
+
+entity HelpFull {
+	id String
+    helpfullCategory HelpFullCategory
+}
+
+enum Rate {
+	VERY_POOR,POOR,NORMAL,GOOD,VERY_GOOD
+}
+
+enum HelpFullCategory {
+	HELPFULL,UNHELPFULL,INAPPRORIATE,SPAM
+}
+
+relationship OneToMany {
+	Review{HelpFulness} to HelpFull
+}
+
+paginate Review with pagination
+service all with serviceImpl
+
+service all with serviceImpl

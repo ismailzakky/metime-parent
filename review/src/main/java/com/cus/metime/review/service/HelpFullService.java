@@ -1,7 +1,9 @@
 package com.cus.metime.review.service;
 
 import com.cus.metime.review.domain.HelpFull;
+import com.cus.metime.review.dto.HelpfullDTO;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Service Interface for managing HelpFull.
@@ -14,14 +16,14 @@ public interface HelpFullService {
      * @param helpFull the entity to save
      * @return the persisted entity
      */
-    HelpFull save(HelpFull helpFull);
+    HelpfullDTO save(HelpfullDTO helpFull);
 
     /**
      *  Get all the helpFulls.
      *
      *  @return the list of entities
      */
-    List<HelpFull> findAll();
+    List<HelpfullDTO> findAll();
 
     /**
      *  Get the "id" helpFull.
@@ -29,7 +31,7 @@ public interface HelpFullService {
      *  @param id the id of the entity
      *  @return the entity
      */
-    HelpFull findOne(Long id);
+    HelpfullDTO findOne(Long id);
 
     /**
      *  Delete the "id" helpFull.

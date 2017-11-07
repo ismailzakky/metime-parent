@@ -2,9 +2,12 @@ package com.cus.metime.review.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.cus.metime.review.domain.Review;
+import com.cus.metime.review.dto.ReviewDTO;
+import com.cus.metime.review.service.HelpFullService;
 import com.cus.metime.review.service.ReviewService;
 import com.cus.metime.review.web.rest.util.HeaderUtil;
 import com.cus.metime.review.web.rest.util.PaginationUtil;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiParam;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
@@ -34,9 +37,11 @@ public class ReviewResource {
     private static final String ENTITY_NAME = "review";
 
     private final ReviewService reviewService;
+    private final HelpFullService helpFullService;
 
-    public ReviewResource(ReviewService reviewService) {
+    public ReviewResource(ReviewService reviewService, HelpFullService helpFullService) {
         this.reviewService = reviewService;
+        this.helpFullService = helpFullService;
     }
 
     /**
@@ -48,12 +53,12 @@ public class ReviewResource {
      */
     @PostMapping("/reviews")
     @Timed
-    public ResponseEntity<Review> createReview(@RequestBody Review review) throws URISyntaxException {
+    public ResponseEntity<ReviewDTO> createReview(@RequestBody ReviewDTO review) throws URISyntaxException {
         log.debug("REST request to save Review : {}", review);
         if (review.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new review cannot already have an ID")).body(null);
         }
-        Review result = reviewService.save(review);
+        ReviewDTO result = reviewService.save(review);
         return ResponseEntity.created(new URI("/api/reviews/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -70,12 +75,12 @@ public class ReviewResource {
      */
     @PutMapping("/reviews")
     @Timed
-    public ResponseEntity<Review> updateReview(@RequestBody Review review) throws URISyntaxException {
+    public ResponseEntity<ReviewDTO> updateReview(@RequestBody ReviewDTO review) throws URISyntaxException {
         log.debug("REST request to update Review : {}", review);
         if (review.getId() == null) {
             return createReview(review);
         }
-        Review result = reviewService.save(review);
+        ReviewDTO result = reviewService.save(review);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, review.getId().toString()))
             .body(result);
@@ -89,11 +94,22 @@ public class ReviewResource {
      */
     @GetMapping("/reviews")
     @Timed
-    public ResponseEntity<List<Review>> getAllReviews(@ApiParam Pageable pageable) {
+    public ResponseEntity<List<ReviewDTO>> getAllReviews(@ApiParam Pageable pageable) {
         log.debug("REST request to get a page of Reviews");
-        Page<Review> page = reviewService.findAll(pageable);
+        Page<ReviewDTO> page = reviewService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/reviews");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+    }
+    
+    @GetMapping("/reviews/segment1/{id}")
+    @Timed
+    public ResponseEntity<List<ReviewDTO>> getAllReviewsBySegment(@PathVariable String id,
+            @RequestParam(value="limit", required=true) int limit,
+            @RequestParam(value="offset", required=true) int offset) {
+        log.debug("REST request to get a page of Reviews");
+        List<ReviewDTO> reviews = reviewService.findAllReviewsBySegment(id, limit, offset);
+//        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/reviews");
+        return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
     /**
@@ -104,9 +120,9 @@ public class ReviewResource {
      */
     @GetMapping("/reviews/{id}")
     @Timed
-    public ResponseEntity<Review> getReview(@PathVariable Long id) {
+    public ResponseEntity<ReviewDTO> getReview(@PathVariable Long id) {
         log.debug("REST request to get Review : {}", id);
-        Review review = reviewService.findOne(id);
+        ReviewDTO review = reviewService.findOne(id);
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(review));
     }
 

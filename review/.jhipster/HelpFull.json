@@ -1,0 +1,23 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipName": "review",
+            "otherEntityName": "review",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "id"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "helpfullCategory",
+            "fieldType": "HelpFullCategory",
+            "fieldValues": "HELPFULL,UNHELPFULL,INAPPRORIATE,SPAM"
+        }
+    ],
+    "changelogDate": "20170924132926",
+    "entityTableName": "help_full",
+    "dto": "no",
+    "pagination": "no",
+    "service": "serviceImpl"
+}

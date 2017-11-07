@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import com.cus.metime.review.domain.enumeration.HelpFullCategory;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * A HelpFull.
@@ -21,16 +22,26 @@ public class HelpFull implements Serializable {
     @SequenceGenerator(name = "sequenceGenerator")
     private Long id;
 
-    @Column(name = "creational_date")
-    private String creationalDate;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "helpfull_category")
     private HelpFullCategory helpfullCategory;
 
     @ManyToOne
     private Review review;
+    
+    @Embedded
+    private CreationalDate creationalDate;
 
+    public HelpFull() {
+    }
+    
+    public HelpFull(Long id, HelpFullCategory helpfullCategory, Review review, CreationalDate creationalDate) {
+        this.id = id;
+        this.helpfullCategory = helpfullCategory;
+        this.review = review;
+        this.creationalDate = creationalDate;
+    }
+    
     // jhipster-needle-entity-add-field - Jhipster will add fields here, do not remove
     public Long getId() {
         return id;
@@ -38,19 +49,6 @@ public class HelpFull implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getCreationalDate() {
-        return creationalDate;
-    }
-
-    public HelpFull creationalDate(String creationalDate) {
-        this.creationalDate = creationalDate;
-        return this;
-    }
-
-    public void setCreationalDate(String creationalDate) {
-        this.creationalDate = creationalDate;
     }
 
     public HelpFullCategory getHelpfullCategory() {
@@ -78,6 +76,14 @@ public class HelpFull implements Serializable {
     public void setReview(Review review) {
         this.review = review;
     }
+    
+    public CreationalDate getCreationalDate() {
+        return creationalDate;
+    }
+
+    public void setCreationalDate(CreationalDate creationalDate) {
+        this.creationalDate = creationalDate;
+    }
     // jhipster-needle-entity-add-getters-setters - Jhipster will add getters and setters here, do not remove
 
     @Override
@@ -104,8 +110,8 @@ public class HelpFull implements Serializable {
     public String toString() {
         return "HelpFull{" +
             "id=" + getId() +
-            ", creationalDate='" + getCreationalDate() + "'" +
             ", helpfullCategory='" + getHelpfullCategory() + "'" +
+            ", creationalDate='" + getCreationalDate().toString()+ "'" +
             "}";
     }
 }

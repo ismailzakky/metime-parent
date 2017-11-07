@@ -1,0 +1,181 @@
+{
+	"variables": [],
+	"info": {
+		"name": "REVIEW",
+		"_postman_id": "c4949e4a-2155-6121-6fa9-ec669af8032e",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "LIST Review",
+			"request": {
+				"url": "http://localhost:9904/api/reviews",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"rate\": \"VERY_POOR\",\n\t\"comment\": \"Testing\",\n\t\"segment_1\": \"2\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "LIST Review By Segment1",
+			"request": {
+				"url": {
+					"raw": "http://localhost:9904/api/reviews/segment1/1?limit=10&offset=0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9904",
+					"path": [
+						"api",
+						"reviews",
+						"segment1",
+						"1"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "10",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "offset",
+							"value": "0",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"limit\": 10,\n\t\"offset\": 0\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "GET REVIEW",
+			"request": {
+				"url": "http://localhost:9904/api/reviews/1",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"rate\": \"VERY_POOR\",\n\t\"comment\": \"Testing\",\n\t\"segment_1\": \"2\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "SAVE Review",
+			"request": {
+				"url": "http://localhost:9904/api/reviews",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"rate\": \"GOOD\",\n\t\"comment\": \"TestingAtas\",\n\t\"segment1\": \"1\",\n\t\"creationalDate\": {\n\t\t\"createdBy\": \"33\"\n\t}\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "UPDATE Review",
+			"request": {
+				"url": "http://localhost:9904/api/helpfull",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": \"1\",\n\t\"rate\": \"VERY_POOR\",\n\t\"comment\": \"TestingUpdate\",\n\t\"segment1\": \"1\",\n\t\"creationalDate\": {\n\t\t\"modifiedBy\": \"22\"\n\t}\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "LIST Helpfull",
+			"request": {
+				"url": "http://localhost:9904/api/help-fulls",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "GET Helpfull",
+			"request": {
+				"url": "http://localhost:9904/api/help-fulls/1",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "SAVE Helpfull",
+			"request": {
+				"url": "http://localhost:9904/api/help-fulls",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"helpfullCategory\": \"HELPFULL\",\n\t\"review\": {\n        \"id\": 1\n    },\n    \"creationalDate\": {\n        \"createdBy\": \"44\"\n    }\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

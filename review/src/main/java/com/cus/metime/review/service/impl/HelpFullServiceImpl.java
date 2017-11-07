@@ -1,8 +1,12 @@
 package com.cus.metime.review.service.impl;
 
-import com.cus.metime.review.service.HelpFullService;
+import com.cus.metime.review.domain.CreationalDate;
 import com.cus.metime.review.domain.HelpFull;
+import com.cus.metime.review.service.HelpFullService;
+import com.cus.metime.review.dto.HelpfullDTO;
+import com.cus.metime.review.dto.assembler.HelpfullAssembler;
 import com.cus.metime.review.repository.HelpFullRepository;
+import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -32,9 +36,25 @@ public class HelpFullServiceImpl implements HelpFullService{
      * @return the persisted entity
      */
     @Override
-    public HelpFull save(HelpFull helpFull) {
+    public HelpfullDTO save(HelpfullDTO helpFull) {
+        CreationalDate creationalDate = new CreationalDate();
+        if (helpFull.getId() == null) {
+            creationalDate.setCreatedAt(new Date());
+            creationalDate.setCreatedBy(helpFull.getCreationalDate().getCreatedBy());
+            creationalDate.setModifiedAt(new Date());
+            creationalDate.setModifiedBy(helpFull.getCreationalDate().getCreatedBy());
+        } else {
+            HelpfullDTO reviewExisting = findOne(helpFull.getId());
+            creationalDate.setCreatedAt(reviewExisting.getCreationalDate().getCreatedAt());
+            creationalDate.setCreatedBy(reviewExisting.getCreationalDate().getCreatedBy());
+            creationalDate.setModifiedAt(new Date());
+            creationalDate.setModifiedBy(helpFull.getCreationalDate().getModifiedBy());
+        }
+        helpFull.setCreationalDate(creationalDate);
         log.debug("Request to save HelpFull : {}", helpFull);
-        return helpFullRepository.save(helpFull);
+        return new HelpfullAssembler()
+                .toDTO(helpFullRepository
+                        .save(new HelpfullAssembler().toDomain(helpFull)));
     }
 
     /**
@@ -44,9 +64,10 @@ public class HelpFullServiceImpl implements HelpFullService{
      */
     @Override
     @Transactional(readOnly = true)
-    public List<HelpFull> findAll() {
+    public List<HelpfullDTO> findAll() {
         log.debug("Request to get all HelpFulls");
-        return helpFullRepository.findAll();
+        return new HelpfullAssembler()
+                .toDTOs(helpFullRepository.findAll());
     }
 
     /**
@@ -57,9 +78,14 @@ public class HelpFullServiceImpl implements HelpFullService{
      */
     @Override
     @Transactional(readOnly = true)
-    public HelpFull findOne(Long id) {
+    public HelpfullDTO findOne(Long id) {
         log.debug("Request to get HelpFull : {}", id);
-        return helpFullRepository.findOne(id);
+        HelpFull helpFull = helpFullRepository.findOne(id);
+        if (helpFull == null) {
+            helpFull = new HelpFull();
+        }
+        return new HelpfullAssembler()
+                .toDTO(helpFull);
     }
 
     /**
@@ -72,4 +98,5 @@ public class HelpFullServiceImpl implements HelpFullService{
         log.debug("Request to delete HelpFull : {}", id);
         helpFullRepository.delete(id);
     }
+    
 }
