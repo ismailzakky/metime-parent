@@ -1,6 +1,6 @@
 package com.cus.metime.promosi.config;
 
-import com.cus.metime.promosi.security.AuthoritiesConstants;
+import com.cus.metime.shared.security.uaa.AuthoritiesConstants;
 import io.github.jhipster.config.JHipsterProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
