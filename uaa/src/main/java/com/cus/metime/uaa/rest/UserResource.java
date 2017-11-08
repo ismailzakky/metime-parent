@@ -4,7 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.cus.metime.uaa.config.Constants;
 import com.cus.metime.uaa.domain.User;
 import com.cus.metime.uaa.repository.UserRepository;
-import com.cus.metime.uaa.security.AuthoritiesConstants;
+import com.cus.metime.shared.security.uaa.AuthoritiesConstants;
 import com.cus.metime.uaa.service.MailService;
 import com.cus.metime.uaa.service.UserService;
 import com.cus.metime.uaa.service.dto.UserDTO;

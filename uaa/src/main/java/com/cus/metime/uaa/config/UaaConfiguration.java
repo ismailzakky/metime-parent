@@ -1,6 +1,6 @@
 package com.cus.metime.uaa.config;
 
-import com.cus.metime.uaa.security.AuthoritiesConstants;
+import com.cus.metime.shared.security.uaa.AuthoritiesConstants;
 import io.github.jhipster.config.JHipsterProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

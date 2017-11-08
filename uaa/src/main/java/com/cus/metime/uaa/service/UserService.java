@@ -9,7 +9,7 @@ import com.cus.metime.uaa.domain.User;
 import com.cus.metime.uaa.domain.builder.UserBuilder;
 import com.cus.metime.uaa.repository.AuthorityRepository;
 import com.cus.metime.uaa.repository.UserRepository;
-import com.cus.metime.uaa.security.AuthoritiesConstants;
+import com.cus.metime.shared.security.uaa.AuthoritiesConstants;
 import com.cus.metime.uaa.security.SecurityUtils;
 import com.cus.metime.uaa.service.dto.UserDTO;
 import com.cus.metime.uaa.service.util.RandomUtil;

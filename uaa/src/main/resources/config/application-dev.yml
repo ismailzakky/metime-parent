@@ -36,7 +36,7 @@ spring:
         type: com.zaxxer.hikari.HikariDataSource
         url: jdbc:postgresql://localhost:5432/uaa
         username: postgres
-        password: zakky
+        password: kreon225
     jpa:
         database-platform: io.github.jhipster.domain.util.FixedPostgreSQL82Dialect
         database: POSTGRESQL
@@ -84,10 +84,10 @@ spring:
                     environment:
                         spring:
                             rabbitmq:
-                                addresses: elephant.rmq.cloudamqp.com
-                                username: dxikxozh
-                                password: qbTbnhBbUkz5F0WIKjKR602qitA8vNT5
-                                virtual-host: dxikxozh
+                                host: 10.17.33.240
+                                port: 5672
+                                username: guest
+                                passowrd: guest
 
 liquibase:
     contexts: dev

@@ -31,9 +31,8 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @SequenceGenerator(name = "sequenceGenerator")
     private Long id;
 
-    @NotNull
     @Size(min = 1, max = 50)
-    @Column(length = 50, nullable = false)
+    @Column(length = 50)
     private String uuid;
 
     @NotNull

@@ -1,5 +1,6 @@
 package com.cus.metime.uaa.security;
 
+import com.cus.metime.shared.security.uaa.AuthoritiesConstants;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
