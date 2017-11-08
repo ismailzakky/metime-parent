@@ -3,6 +3,7 @@ package com.cus.metime.promosi.config;
 import com.cus.metime.shared.security.uaa.AuthoritiesConstants;
 import io.github.jhipster.config.JHipsterProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.RestTemplateCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +31,9 @@ public class MicroserviceSecurityConfiguration extends ResourceServerConfigurerA
     private final JHipsterProperties jHipsterProperties;
 
     private final DiscoveryClient discoveryClient;
+
+    @Value("$uaa.url")
+    private String uaaUrl;
 
     public MicroserviceSecurityConfiguration(JHipsterProperties jHipsterProperties,
             DiscoveryClient discoveryClient) {
@@ -85,7 +89,7 @@ public class MicroserviceSecurityConfiguration extends ResourceServerConfigurerA
         HttpEntity<Void> request = new HttpEntity<Void>(new HttpHeaders());
         RestTemplate restTemplate = new RestTemplate();
         return (String) restTemplate
-            .exchange("http://10.17.33.240:9901/oauth/token_key", HttpMethod.GET, request, Map.class).getBody()
+            .exchange(uaaUrl+"/oauth/token_key", HttpMethod.GET, request, Map.class).getBody()
             .get("value");
 
     }

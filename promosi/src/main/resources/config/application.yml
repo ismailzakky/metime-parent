@@ -34,6 +34,8 @@ eureka:
             zone: primary # This is needed for the load balancer
             profile: ${spring.profiles.active}
             version: ${info.project.version}
+uaa:
+    url: http://10.17.33.240:9901
 ribbon:
     eureka:
         enabled: true

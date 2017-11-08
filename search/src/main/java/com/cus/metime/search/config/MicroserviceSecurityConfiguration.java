@@ -5,6 +5,7 @@ import com.cus.metime.search.security.AuthoritiesConstants;
 import io.github.jhipster.config.JHipsterProperties;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.RestTemplateCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +33,9 @@ public class MicroserviceSecurityConfiguration extends ResourceServerConfigurerA
     private final JHipsterProperties jHipsterProperties;
 
     private final DiscoveryClient discoveryClient;
+
+    @Value("$uaa.url")
+    private String uaaUrl;
 
     public MicroserviceSecurityConfiguration(JHipsterProperties jHipsterProperties,
             DiscoveryClient discoveryClient) {
@@ -85,8 +89,9 @@ public class MicroserviceSecurityConfiguration extends ResourceServerConfigurerA
         // Load available UAA servers
         discoveryClient.getServices();
         HttpEntity<Void> request = new HttpEntity<Void>(new HttpHeaders());
-        return (String) keyUriRestTemplate
-            .exchange("http://uaa/oauth/token_key", HttpMethod.GET, request, Map.class).getBody()
+        RestTemplate restTemplate = new RestTemplate();
+        return (String) restTemplate
+            .exchange(uaaUrl+"/oauth/token_key", HttpMethod.GET, request, Map.class).getBody()
             .get("value");
 
     }
