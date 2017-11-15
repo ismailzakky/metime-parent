@@ -1,6 +1,7 @@
 package com.cus.metime.promosi.domain.builder;
 
 import com.cus.metime.promosi.domain.Promo;
+import com.cus.metime.promosi.domain.CloudinaryImage;
 import com.cus.metime.promosi.domain.embeddable.CreationalDate;
 import com.cus.metime.promosi.domain.embeddable.ValidityPeriod;
 import com.cus.metime.promosi.domain.enumeration.PromoCategory;
@@ -12,6 +13,7 @@ public class PromoBuilder {
     private ValidityPeriod validityPeriod;
     private String segment;
     private String uuid;
+    private CloudinaryImage cloudinaryImage;
 
     public PromoBuilder setMediaFile(String mediaFile) {
         this.mediaFile = mediaFile;
@@ -43,7 +45,12 @@ public class PromoBuilder {
         return this;
     }
 
+    public PromoBuilder setCloudinaryImage(CloudinaryImage cloudinaryImage) {
+        this.cloudinaryImage = cloudinaryImage;
+        return this;
+    }
+
     public Promo createPromo() {
-        return new Promo(mediaFile, promoCategory, creationalDate, validityPeriod, segment, uuid);
+        return new Promo(mediaFile, promoCategory, creationalDate, validityPeriod, segment, uuid, cloudinaryImage);
     }
 }

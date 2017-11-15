@@ -2,15 +2,19 @@ package com.cus.metime.promosi.service.impl;
 
 import com.cus.metime.promosi.Assembler.PromoAssembler;
 import com.cus.metime.promosi.domain.Promo;
+import com.cus.metime.promosi.domain.enumeration.PromoCategory;
+import com.cus.metime.promosi.dto.CloudinaryImageDTO;
 import com.cus.metime.promosi.dto.CreationalDateDTO;
 import com.cus.metime.promosi.dto.PromoDTO;
+import com.cus.metime.promosi.dto.builder.CloudinaryImageDTOBuilder;
 import com.cus.metime.promosi.dto.builder.CreationalDateDTOBuilder;
 import com.cus.metime.promosi.repository.PromoRepository;
 import com.cus.metime.promosi.security.SecurityUtils;
 import com.cus.metime.promosi.service.AssyncMessagingService;
 import com.cus.metime.promosi.service.PromoService;
 import com.cus.metime.shared.messaging.MessageEvent;
-import com.cus.metime.shared.util.RandomString;
+import com.cus.metime.shared.services.CloudinaryFileHandling;
+import com.cloudinary.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -42,7 +48,6 @@ public class PromoServiceImpl implements PromoService{
     private AssyncMessagingService assyncMessagingService;
 
 
-
     /**
      * Save a promo.
      *
@@ -56,24 +61,49 @@ public class PromoServiceImpl implements PromoService{
         String currentUser = SecurityUtils.getCurrentUserLogin();
         CreationalDateDTO creationalDateDTO = new CreationalDateDTOBuilder().setCreatedAt(LocalDateTime.now()).setCreatedBy(currentUser).setModifiedBy(currentUser).setModifiedAt(LocalDateTime.now()).createCreationalDateDTO();
         promoDTO.setCreationalDateDTO(creationalDateDTO);
-        boolean successSaving = false;
+        boolean successUpload = false;
         Promo savedPromo = null;
-        RandomString randomString = new RandomString(10, ThreadLocalRandom.current());
-        String fileName = randomString.nextString();
-        promoDTO.setMediaFile(fileName);
-        promoDTO.setUuid(UUID.randomUUID().toString());
-        try{
-            savedPromo = promoRepository.save(promoAssembler.toDomain(promoDTO));
-            successSaving = true;
-        } catch (Exception e){
-            log.debug("failed to save data");
-            e.printStackTrace();
-        } finally {
-            if(successSaving){
-                assyncMessagingService.sendImageFile(file, fileName,savedPromo, MessageEvent.CREATE);
-                assyncMessagingService.sendIndexMessage(MessageEvent.CREATE,savedPromo);
+
+        CloudinaryFileHandling cloudinaryFileHandling = new CloudinaryFileHandling("me-time","947139922155272","UxefH95eO8rFMj9O-VaK923RrQg");
+        if(promoDTO.getPromoCategory() == PromoCategory.CUSTOM){
+            try{
+                Map resultMap = cloudinaryFileHandling.uploadIMage(file);
+                CloudinaryImageDTO cloudinaryImageDTO = new CloudinaryImageDTOBuilder()
+                        .setPublicId((String) resultMap.get("public_Id"))
+                        .setVersion((String) resultMap.get("version"))
+                        .setSignature((String) resultMap.get("signature"))
+                        .setWidth(Float.parseFloat( (String) resultMap.get("width")))
+                        .setHeight(Float.parseFloat( (String) resultMap.get("height")))
+                        .setFormat((String) resultMap.get("format"))
+                        .setResourceType((String) resultMap.get("resource_type"))
+                        .setBytes(Long.parseLong((String) resultMap.get("bytes")))
+                        .setType((String) resultMap.get("type"))
+                        .setUrl((String) resultMap.get("url"))
+                        .setSecureUrl((String) resultMap.get("secure_url"))
+                        .setEtag((String)resultMap.get("etag"))
+                        .createCloudinaryImageDTO();
+
+                promoDTO.setCloudinaryImageDTO(cloudinaryImageDTO);
+                successUpload = true;
+            } catch (Exception e){
+                e.printStackTrace();
+                successUpload = false;
+            } finally {
+                if(successUpload){
+                    savedPromo = promoRepository.save(promoAssembler.toDomain(promoDTO));
+                }
+            }
+        } else {
+            try {
+                savedPromo = promoRepository.save(promoAssembler.toDomain(promoDTO));
+            } catch (Exception e){
+                e.printStackTrace();
+                savedPromo = null;
             }
         }
+
+
+
         return savedPromo;
     }
 
@@ -120,6 +150,7 @@ public class PromoServiceImpl implements PromoService{
         log.debug("Request to delete Promo : {}", id);
         Promo currentPromo = null;
         boolean success = false;
+        CloudinaryFileHandling cloudinaryFileHandling = new CloudinaryFileHandling("me-time","947139922155272","UxefH95eO8rFMj9O-VaK923RrQg");
         try{
             currentPromo = promoRepository.findOne(id);
             promoRepository.delete(id);
@@ -129,10 +160,8 @@ public class PromoServiceImpl implements PromoService{
             e.printStackTrace();
         } finally {
             if(success){
-
                 try {
-                    assyncMessagingService.sendIndexMessage(MessageEvent.DELETE,currentPromo);
-                    assyncMessagingService.sendImageFile(null,null, currentPromo, MessageEvent.DELETE);
+                    cloudinaryFileHandling.deleteImage(currentPromo.getCloudinaryImage().getPublicId());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -163,11 +192,8 @@ public class PromoServiceImpl implements PromoService{
         } catch(Exception e){
             log.debug("failed to update promo",promo);
             e.printStackTrace();
-        } finally {
-            if(success){
-                assyncMessagingService.sendIndexMessage(MessageEvent.UPDATE,promo);
-            }
         }
+
         return promo;
     }
 }

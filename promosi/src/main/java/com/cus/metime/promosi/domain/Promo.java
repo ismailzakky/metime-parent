@@ -42,17 +42,21 @@ public class Promo implements Serializable {
     @Column(name = "uuid")
     private String uuid;
 
+    @OneToOne
+    private CloudinaryImage cloudinaryImage;
+
 
     public Promo() {
     }
 
-    public Promo(String mediaFile, PromoCategory promoCategory, CreationalDate creationalDate, ValidityPeriod validityPeriod, String segment, String uuid) {
+    public Promo(String mediaFile, PromoCategory promoCategory, CreationalDate creationalDate, ValidityPeriod validityPeriod, String segment, String uuid, CloudinaryImage cloudinaryImage) {
         this.mediaFile = mediaFile;
         this.promoCategory = promoCategory;
         this.creationalDate = creationalDate;
         this.validityPeriod = validityPeriod;
         this.segment = segment;
         this.uuid = uuid;
+        this.cloudinaryImage = cloudinaryImage;
     }
 
     public static long getSerialVersionUID() {
@@ -128,6 +132,14 @@ public class Promo implements Serializable {
         this.segment = segment;
     }
 
+    public CloudinaryImage getCloudinaryImage() {
+        return cloudinaryImage;
+    }
+
+    public void setCloudinaryImage(CloudinaryImage cloudinaryImage) {
+        this.cloudinaryImage = cloudinaryImage;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -151,13 +163,14 @@ public class Promo implements Serializable {
     @Override
     public String toString() {
         return "Promo{" +
-            "id=" + id +
-            ", mediaFile='" + mediaFile + '\'' +
-            ", promoCategory=" + promoCategory +
-            ", creationalDate=" + creationalDate +
-            ", validityPeriod=" + validityPeriod +
-            ", segment='" + segment + '\'' +
-            ", uuid='" + uuid + '\'' +
-            '}';
+                "id=" + id +
+                ", mediaFile='" + mediaFile + '\'' +
+                ", promoCategory=" + promoCategory +
+                ", creationalDate=" + creationalDate +
+                ", validityPeriod=" + validityPeriod +
+                ", segment='" + segment + '\'' +
+                ", uuid='" + uuid + '\'' +
+                ", cloudinaryImage=" + cloudinaryImage +
+                '}';
     }
 }

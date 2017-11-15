@@ -1,6 +1,7 @@
 package com.cus.metime.promosi.dto.builder;
 
 import com.cus.metime.promosi.domain.enumeration.PromoCategory;
+import com.cus.metime.promosi.dto.CloudinaryImageDTO;
 import com.cus.metime.promosi.dto.CreationalDateDTO;
 import com.cus.metime.promosi.dto.PromoDTO;
 import com.cus.metime.promosi.dto.ValidityPeriodDTO;
@@ -13,6 +14,7 @@ public class PromoDTOBuilder {
     private CreationalDateDTO creationalDateDTO;
     private String segment;
     private String uuid;
+    private CloudinaryImageDTO cloudinaryImageDTO;
 
     public PromoDTOBuilder setId(Long id) {
         this.id = id;
@@ -49,7 +51,12 @@ public class PromoDTOBuilder {
         return this;
     }
 
+    public PromoDTOBuilder setCloudinaryImageDTO(CloudinaryImageDTO cloudinaryImageDTO) {
+        this.cloudinaryImageDTO = cloudinaryImageDTO;
+        return this;
+    }
+
     public PromoDTO createPromoDTO() {
-        return new PromoDTO(id, promoCategory, mediaFile, validityPeriodDTO, creationalDateDTO, segment, uuid);
+        return new PromoDTO(id, promoCategory, mediaFile, validityPeriodDTO, creationalDateDTO, segment, uuid, cloudinaryImageDTO);
     }
 }

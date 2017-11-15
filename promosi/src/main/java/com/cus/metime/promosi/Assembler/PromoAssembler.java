@@ -21,22 +21,26 @@ public class PromoAssembler implements ObjectAssembler<Promo,PromoDTO> {
     private CreationalDateAssembler creationalDateAssembler;
     @Autowired
     private ValidityPeriodAssembler validityPeriodAssembler;
+    @Autowired
+    private CloudinaryImageAssembler cloudinaryImageAssembler;
 
     @Override
     public Promo toDomain(PromoDTO dtoObject) {
         return new PromoBuilder()
-            .setCreationalDate(creationalDateAssembler.toDomain(dtoObject.getCreationalDateDTO()))
-            .setValidityPeriod(validityPeriodAssembler.toDomain(dtoObject.getValidityPeriodDTO()))
-            .setSegment(dtoObject.getSegment())
-            .setMediaFile(dtoObject.getMediaFile())
-            .setPromoCategory(dtoObject.getPromoCategory())
-            .setUuid(dtoObject.getUuid())
-            .createPromo();
+                .setCloudinaryImage(dtoObject.getCloudinaryImageDTO())
+                .setCreationalDate(creationalDateAssembler.toDomain(dtoObject.getCreationalDateDTO()))
+                .setValidityPeriod(validityPeriodAssembler.toDomain(dtoObject.getValidityPeriodDTO()))
+                .setSegment(dtoObject.getSegment())
+                .setMediaFile(dtoObject.getMediaFile())
+                .setPromoCategory(dtoObject.getPromoCategory())
+                .setUuid(dtoObject.getUuid())
+                .createPromo();
     }
 
     @Override
     public PromoDTO toDTO(Promo domainObject) {
         return new PromoDTOBuilder()
+                .setCloudinaryImageDTO(cloudinaryImageAssembler.toDTO(domainObject.getCloudinaryImage()))
             .setCreationalDateDTO(creationalDateAssembler.toDTO(domainObject.getCreationalDate()))
             .setValidityPeriodDTO(validityPeriodAssembler.toDTO(domainObject.getValidityPeriod()))
             .setSegment(domainObject.getSegment())

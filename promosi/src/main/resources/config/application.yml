@@ -72,11 +72,6 @@ spring:
     cloud:
         stream:
             bindings:
-                fileOutput:
-                    destination: file
-                    binder: rabbitmqserver
-                    contentType: application/x-java-serialized-object
-                    group: fileOutputGroup
                 indexOutput:
                     destination: index
                     binder: rabbitmqserver

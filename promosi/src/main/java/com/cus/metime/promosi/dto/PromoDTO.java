@@ -16,12 +16,13 @@ public class PromoDTO implements Serializable{
     private CreationalDateDTO creationalDateDTO;
     private String segment;
     private String uuid;
+    private CloudinaryImageDTO cloudinaryImageDTO;
 
     public PromoDTO() {
 
     }
 
-    public PromoDTO(Long id, PromoCategory promoCategory, String mediaFile, ValidityPeriodDTO validityPeriodDTO, CreationalDateDTO creationalDateDTO, String segment, String uuid) {
+    public PromoDTO(Long id, PromoCategory promoCategory, String mediaFile, ValidityPeriodDTO validityPeriodDTO, CreationalDateDTO creationalDateDTO, String segment, String uuid, CloudinaryImageDTO cloudinaryImageDTO) {
         this.id = id;
         this.promoCategory = promoCategory;
         this.mediaFile = mediaFile;
@@ -29,8 +30,16 @@ public class PromoDTO implements Serializable{
         this.creationalDateDTO = creationalDateDTO;
         this.segment = segment;
         this.uuid = uuid;
+        this.cloudinaryImageDTO = cloudinaryImageDTO;
     }
 
+    public CloudinaryImageDTO getCloudinaryImageDTO() {
+        return cloudinaryImageDTO;
+    }
+
+    public void setCloudinaryImageDTO(CloudinaryImageDTO cloudinaryImageDTO) {
+        this.cloudinaryImageDTO = cloudinaryImageDTO;
+    }
 
     public Long getId() {
         return id;
@@ -88,16 +97,18 @@ public class PromoDTO implements Serializable{
         this.uuid = uuid;
     }
 
+
     @Override
     public String toString() {
         return "PromoDTO{" +
-            "id=" + id +
-            ", promoCategory=" + promoCategory +
-            ", mediaFile='" + mediaFile + '\'' +
-            ", validityPeriodDTO=" + validityPeriodDTO +
-            ", creationalDateDTO=" + creationalDateDTO +
-            ", segment='" + segment + '\'' +
-            ", uuid='" + uuid + '\'' +
-            '}';
+                "id=" + id +
+                ", promoCategory=" + promoCategory +
+                ", mediaFile='" + mediaFile + '\'' +
+                ", validityPeriodDTO=" + validityPeriodDTO +
+                ", creationalDateDTO=" + creationalDateDTO +
+                ", segment='" + segment + '\'' +
+                ", uuid='" + uuid + '\'' +
+                ", cloudinaryImageDTO=" + cloudinaryImageDTO +
+                '}';
     }
 }

@@ -42,7 +42,7 @@ public class AssyncMessagingService {
         messageChannel.send(eventWrapperDTOMessage);
     }
 
-    public void sendImageFile(MultipartFile multipartFile,String fileName,Promo promo,MessageEvent event) throws IOException {
+    /*public void sendImageFile(MultipartFile multipartFile,String fileName,Promo promo,MessageEvent event) throws IOException {
         MessageChannel messageChannel = outputChannelSource.fileOutput();
         EventWrapperDTO eventWrapperDTO = new EventWrapperDTO();
 
@@ -54,5 +54,5 @@ public class AssyncMessagingService {
         Message<EventWrapperDTO> msg = MessageBuilder.withPayload(eventWrapperDTO).build();
         messageChannel.send(msg);
     }
-
+*/
 }

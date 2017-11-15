@@ -13,7 +13,7 @@ public final class AuthoritiesConstants {
 
     public static final String MANAGER = "ROLE_MANAGER";
 
-    public static final String OWNER = "OWNER";
+    public static final String OWNER = "ROLE_OWNER";
 
     private AuthoritiesConstants() {
     }

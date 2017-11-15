@@ -48,7 +48,7 @@ public class PromosiProcessor {
         }
     }
 
-    @ServiceActivator(inputChannel = "fileInput")
+    /*@ServiceActivator(inputChannel = "fileInput")
     public void fileInputProcessor(Message<byte[]> r) throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -81,6 +81,6 @@ public class PromosiProcessor {
             }
         }
         System.out.println(r);
-    }
+    }*/
 
 }

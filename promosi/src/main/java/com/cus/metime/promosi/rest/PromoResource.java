@@ -57,8 +57,6 @@ public class PromoResource {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new promo cannot already have an ID")).body(null);
         }
 
-
-
         Promo result = promoService.save(promoDTO,file);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))

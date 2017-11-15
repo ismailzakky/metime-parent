@@ -16,7 +16,7 @@
 eureka:
     instance:
         prefer-ip-address: false
-        hostname: 10.17.59.86
+        hostname: localhost
     client:
         service-url:
             defaultZone: http://admin:admin@10.17.33.240:8761/eureka/

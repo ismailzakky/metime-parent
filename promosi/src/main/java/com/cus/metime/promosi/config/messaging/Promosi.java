@@ -13,9 +13,6 @@ import org.springframework.messaging.SubscribableChannel;
 public interface Promosi extends Sink,Source {
 
     @Output
-    MessageChannel fileOutput();
-
-    @Output
     MessageChannel indexOutput();
 
 }

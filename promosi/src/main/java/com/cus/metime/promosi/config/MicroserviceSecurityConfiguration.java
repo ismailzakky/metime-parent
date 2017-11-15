@@ -32,7 +32,7 @@ public class MicroserviceSecurityConfiguration extends ResourceServerConfigurerA
 
     private final DiscoveryClient discoveryClient;
 
-    @Value("$uaa.url")
+    @Value("${uaa.url}")
     private String uaaUrl;
 
     public MicroserviceSecurityConfiguration(JHipsterProperties jHipsterProperties,
