@@ -47,6 +47,7 @@ ribbon:
 #                isolation:
 #                    thread:
 #                        timeoutInMilliseconds: 10000
+cloudinary:  cloudinary://947139922155272:UxefH95eO8rFMj9O-VaK923RrQg@me-time
 
 management:
     security:

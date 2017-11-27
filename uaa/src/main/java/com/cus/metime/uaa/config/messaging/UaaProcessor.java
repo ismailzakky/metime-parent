@@ -13,10 +13,7 @@ import org.springframework.messaging.SubscribableChannel;
 
 public interface UaaProcessor extends Sink,Source{
 
-    @Input
-    SubscribableChannel salonInput();
-
     @Output
-    MessageChannel fileOutput();
+    MessageChannel salonOutput();
 
 }

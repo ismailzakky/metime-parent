@@ -1,6 +1,7 @@
 package com.cus.metime.uaa.service.dto.builder;
 
 import com.cus.metime.uaa.domain.Authority;
+import com.cus.metime.uaa.domain.CloudinaryImage;
 import com.cus.metime.uaa.domain.User;
 import com.cus.metime.uaa.service.dto.UserDTO;
 
@@ -9,13 +10,18 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class UserDTOBuilder {
+
+    private String uuid;
     private User user;
+    private CloudinaryImage imageUrl = user.getCloudinaryImage();
+
     private Long id = user.getId();
     private String login = user.getLogin();
     private String firstName = user.getFirstName();
     private String lastName = user.getLastName();
     private String email = user.getEmail();
-    private String imageUrl = user.getImageUrl();
+    private CloudinaryImage cloudinaryImage;
+    private String webProfile;
     private boolean activated = user.getActivated();
     private String langKey = user.getLangKey();
     private String createdBy = user.getCreatedBy();
@@ -24,8 +30,6 @@ public class UserDTOBuilder {
     private Instant lastModifiedDate = user.getLastModifiedDate();
     private Set<String> authorities = user.getAuthorities().stream().map(Authority::getName)
         .collect(Collectors.toSet());
-    private String uuid;
-
 
     public UserDTOBuilder setId(Long id) {
         this.id = id;
@@ -52,8 +56,13 @@ public class UserDTOBuilder {
         return this;
     }
 
-    public UserDTOBuilder setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public UserDTOBuilder setCloudinaryImage(CloudinaryImage cloudinaryImage) {
+        this.cloudinaryImage = cloudinaryImage;
+        return this;
+    }
+
+    public UserDTOBuilder setWebProfile(String webProfile) {
+        this.webProfile = webProfile;
         return this;
     }
 
@@ -102,7 +111,12 @@ public class UserDTOBuilder {
         return this;
     }
 
+    public UserDTOBuilder setImageUrl(CloudinaryImage imageUrl) {
+        this.imageUrl = imageUrl;
+        return this;
+    }
+
     public UserDTO createUserDTO() {
-        return new UserDTO(id, login, firstName, lastName, email, imageUrl, activated, langKey, createdBy, createdDate, lastModifiedBy, lastModifiedDate, authorities, uuid);
+        return new UserDTO(id, login, firstName, lastName, email, cloudinaryImage, webProfile, activated, langKey, createdBy, createdDate, lastModifiedBy, lastModifiedDate, authorities, uuid);
     }
 }

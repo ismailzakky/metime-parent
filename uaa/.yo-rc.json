@@ -28,6 +28,6 @@
     "jhiPrefix": "jhi",
     "skipClient": true,
     "clientPackageManager": "yarn",
-    "herokuAppName": "metime-uaa"
+    "herokuAppName": null
   }
 }

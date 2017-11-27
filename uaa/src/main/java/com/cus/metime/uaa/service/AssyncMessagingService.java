@@ -24,23 +24,7 @@ import java.util.Map;
 @Service
 public class AssyncMessagingService {
 
-    @Autowired
-    private UaaProcessor outputChannelSource;
 
-    public void sendImageFile(MultipartFile multipartFile,String fileName,User user,MessageEvent event) throws IOException {
-        MessageChannel messageChannel = outputChannelSource.fileOutput();
-        EventWrapperDTO eventWrapperDTO = new EventWrapperDTO();
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        FileTransferDTO fileTransferDTO = new FileTransferDTO(fileName,multipartFile.getBytes(),multipartFile.getOriginalFilename().split("\\.")[1],user.getUuid());
-        eventWrapperDTO.setEvent(event);
-        eventWrapperDTO.setMessage(fileTransferDTO);
-
-        Map<String,Object> eventWrapperMap = objectMapper.convertValue(eventWrapperDTO,Map.class);
-
-        Message<Map<String,Object>> msg = MessageBuilder.withPayload(eventWrapperMap).build();
-        messageChannel.send(msg);
-    }
 
 
 }

@@ -1,17 +1,5 @@
 package com.cus.metime.promosi.config.messaging;
 
-import com.cus.metime.shared.messaging.EventWrapperDTO;
-import com.cus.metime.shared.messaging.filehandler.FileTransferDTO;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.annotation.MessageEndpoint;
-import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.messaging.Message;
-
-import java.io.*;
-import java.lang.reflect.Field;
-import java.util.Map;
-
 /**
  * Created by C-US on 9/25/2017.
  */
@@ -19,7 +7,7 @@ import java.util.Map;
 //@MessageEndpoint
 public class PromosiProcessor {
 
-    @ServiceActivator(inputChannel = "indexInput")
+   /* @ServiceActivator(inputChannel = "indexInput")
     public void indexInputProcessor(Message<byte[]> r) throws IOException, ClassNotFoundException {
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -46,7 +34,7 @@ public class PromosiProcessor {
         for (Field field : src.getClass().getFields()) {
             dest.getClass().getField(field.getName()).set(dest, field.get(src));
         }
-    }
+    }*/
 
     /*@ServiceActivator(inputChannel = "fileInput")
     public void fileInputProcessor(Message<byte[]> r) throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException {

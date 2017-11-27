@@ -12,9 +12,9 @@ public class CloudinaryFileHandling {
 
     private Cloudinary cloudinary;
 
-    public CloudinaryFileHandling(String cloudName, String apiKey, String apiSecret) {
+    public CloudinaryFileHandling(String connectionString) {
         System.out.println("TEST 1231231232");
-        cloudinary = new Cloudinary("cloudinary://"+apiKey+":"+apiSecret+"@"+cloudName);
+        cloudinary = new Cloudinary(connectionString);
     }
 
 

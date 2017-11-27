@@ -69,12 +69,8 @@ spring:
     cloud:
         stream:
             bindings:
-                fileOutput:
-                    destination: file
-                    binder: rabbitmqserver
-                    contentType: application/x-java-serialized-object
                 salonInput:
-                    destination: index
+                    destination: salon
                     binder: rabbitmqserver
                     contentType: application/x-java-serialized-object
             binders:
@@ -87,7 +83,8 @@ spring:
                                 port: 5672
                                 username: guest
                                 passowrd: guest
-
+cloudinary:
+    url: cloudinary://947139922155272:UxefH95eO8rFMj9O-VaK923RrQg@me-time
 security:
     basic:
         enabled: false

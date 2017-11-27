@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.validator.constraints.Email;
 
+import javax.annotation.Nullable;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -60,6 +61,10 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(length = 100, unique = true)
     private String email;
 
+    @Email
+    @Size(min = 5, max = 100)
+    private String webProfile;
+
     @NotNull
     @Column(nullable = false)
     private boolean activated = false;
@@ -68,9 +73,8 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name = "lang_key", length = 5)
     private String langKey;
 
-    @Size(max = 256)
-    @Column(name = "image_url", length = 256)
-    private String imageUrl;
+    @Embedded
+    private CloudinaryImage cloudinaryImage;
 
     @Size(max = 20)
     @Column(name = "activation_key", length = 20)
@@ -98,17 +102,19 @@ public class User extends AbstractAuditingEntity implements Serializable {
     public User() {
     }
 
-    public User(Long id,String uuid, String login, String password, String firstName, String lastName, String email, boolean activated, String langKey, String imageUrl, String activationKey, String resetKey, Instant resetDate, Set<Authority> authorities) {
-        this.id = id;
+
+
+    public User(String uuid, String login, String password, String firstName, String lastName, String email, String webProfile, boolean activated, String langKey, CloudinaryImage cloudinaryImage, String activationKey, String resetKey, Instant resetDate, Set<Authority> authorities) {
         this.uuid = uuid;
         this.login = login;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.webProfile = webProfile;
         this.activated = activated;
         this.langKey = langKey;
-        this.imageUrl = imageUrl;
+        this.cloudinaryImage = cloudinaryImage;
         this.activationKey = activationKey;
         this.resetKey = resetKey;
         this.resetDate = resetDate;
@@ -148,6 +154,26 @@ public class User extends AbstractAuditingEntity implements Serializable {
         this.firstName = firstName;
     }
 
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public String getWebProfile() {
+        return webProfile;
+    }
+
+    public void setWebProfile(String webProfile) {
+        this.webProfile = webProfile;
+    }
+
+    public CloudinaryImage getCloudinaryImage() {
+        return cloudinaryImage;
+    }
+
+    public void setCloudinaryImage(CloudinaryImage cloudinaryImage) {
+        this.cloudinaryImage = cloudinaryImage;
+    }
+
     public String getLastName() {
         return lastName;
     }
@@ -168,13 +194,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
         this.email = email;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
 
     public boolean getActivated() {
         return activated;
@@ -256,7 +276,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
             ", firstName='" + firstName + '\'' +
             ", lastName='" + lastName + '\'' +
             ", email='" + email + '\'' +
-            ", imageUrl='" + imageUrl + '\'' +
             ", activated='" + activated + '\'' +
             ", langKey='" + langKey + '\'' +
             ", activationKey='" + activationKey + '\'' +

@@ -5,6 +5,8 @@ import com.cus.metime.promosi.domain.Promo;
 import com.cus.metime.shared.messaging.EventWrapperDTO;
 import com.cus.metime.shared.messaging.MessageEvent;
 import com.cus.metime.shared.messaging.filehandler.FileTransferDTO;
+import com.cus.metime.shared.messaging.promotion.PromoMessagingDTO;
+import com.cus.metime.shared.messaging.promotion.builder.PromoMessagingDTOBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
@@ -24,10 +26,12 @@ import java.util.Map;
 public class AssyncMessagingService {
 
     private final Promosi outputChannelSource;
+    private final PromoService promoService;
 
     @Autowired
-    public AssyncMessagingService(Promosi outputChannelSource){
+    public AssyncMessagingService(Promosi outputChannelSource,PromoService promoService){
         this.outputChannelSource = outputChannelSource;
+        this.promoService = promoService;
     }
 
     public void sendIndexMessage(MessageEvent event, Promo promo){
@@ -35,7 +39,16 @@ public class AssyncMessagingService {
         MessageChannel messageChannel = outputChannelSource.indexOutput();
 
         EventWrapperDTO eventWrapperDTO = new EventWrapperDTO();
-        eventWrapperDTO.setMessage(promo);
+        eventWrapperDTO.setMessage(new PromoMessagingDTOBuilder()
+                .setStartDate(promo.getValidityPeriod().getStartDate())
+                .setEndDate(promo.getValidityPeriod().getEndDate())
+                .setPromoCategory(promo.getPromoCategory().toString())
+                .setSalondUUID(promo.getSegment())
+                .setPromoUUID(promo.getUuid())
+                .setImagePublicId(promo.getCloudinaryImage().getUrl())
+                .setImageSecurlUrl(promo.getCloudinaryImage().getSecureUrl())
+                .setImagePublicId(promo.getCloudinaryImage().getPublicId())
+                .createPromoMessagingDTO());
         eventWrapperDTO.setEvent(event);
 
         Message<EventWrapperDTO> eventWrapperDTOMessage = MessageBuilder.withPayload(eventWrapperDTO).build();

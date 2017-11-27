@@ -1,7 +1,9 @@
 package com.cus.metime.uaa.service.dto;
 
+import com.cloudinary.Cloudinary;
 import com.cus.metime.uaa.config.Constants;
 import com.cus.metime.uaa.domain.Authority;
+import com.cus.metime.uaa.domain.CloudinaryImage;
 import com.cus.metime.uaa.domain.User;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
@@ -34,7 +36,9 @@ public class UserDTO {
     private String email;
 
     @Size(max = 256)
-    private String imageUrl;
+    private CloudinaryImage cloudinaryImage;
+
+    private String webProfile;
 
     private boolean activated = false;
 
@@ -57,13 +61,15 @@ public class UserDTO {
         // Empty constructor needed for Jackson.
     }
 
-    public UserDTO(Long id, String login, String firstName, String lastName, String email, String imageUrl, boolean activated, String langKey, String createdBy, Instant createdDate, String lastModifiedBy, Instant lastModifiedDate, Set<String> authorities, String uuid) {
+
+    public UserDTO(Long id, String login, String firstName, String lastName, String email, CloudinaryImage cloudinaryImage, String webProfile, boolean activated, String langKey, String createdBy, Instant createdDate, String lastModifiedBy, Instant lastModifiedDate, Set<String> authorities, String uuid) {
         this.id = id;
         this.login = login;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.imageUrl = imageUrl;
+        this.cloudinaryImage = cloudinaryImage;
+        this.webProfile = webProfile;
         this.activated = activated;
         this.langKey = langKey;
         this.createdBy = createdBy;
@@ -76,14 +82,14 @@ public class UserDTO {
 
     public UserDTO(User user) {
         this(user.getId(), user.getLogin(), user.getFirstName(), user.getLastName(),
-            user.getEmail(), user.getActivated(), user.getImageUrl(), user.getLangKey(),
+            user.getEmail(), user.getActivated(), user.getCloudinaryImage(), user.getLangKey(),
             user.getCreatedBy(), user.getCreatedDate(), user.getLastModifiedBy(), user.getLastModifiedDate(),
             user.getAuthorities().stream().map(Authority::getName)
                 .collect(Collectors.toSet()));
     }
 
     public UserDTO(Long id, String login, String firstName, String lastName,
-        String email, boolean activated, String imageUrl, String langKey,
+        String email, boolean activated, CloudinaryImage imageUrl, String langKey,
         String createdBy, Instant createdDate, String lastModifiedBy, Instant lastModifiedDate,
         Set<String> authorities) {
 
@@ -93,7 +99,7 @@ public class UserDTO {
         this.lastName = lastName;
         this.email = email;
         this.activated = activated;
-        this.imageUrl = imageUrl;
+        this.cloudinaryImage = imageUrl;
         this.langKey = langKey;
         this.createdBy = createdBy;
         this.createdDate = createdDate;
@@ -118,92 +124,84 @@ public class UserDTO {
         this.login = login;
     }
 
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
     public String getFirstName() {
         return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public boolean isActivated() {
-        return activated;
-    }
-
-    public String getLangKey() {
-        return langKey;
     }
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
-
-
+    public String getLastName() {
+        return lastName;
+    }
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public CloudinaryImage getCloudinaryImage() {
+        return cloudinaryImage;
+    }
+
+    public void setCloudinaryImage(CloudinaryImage cloudinaryImage) {
+        this.cloudinaryImage = cloudinaryImage;
+    }
+
+    public String getWebProfile() {
+        return webProfile;
+    }
+
+    public void setWebProfile(String webProfile) {
+        this.webProfile = webProfile;
+    }
+
+    public boolean isActivated() {
+        return activated;
     }
 
     public void setActivated(boolean activated) {
         this.activated = activated;
     }
 
+    public String getLangKey() {
+        return langKey;
+    }
 
     public void setLangKey(String langKey) {
         this.langKey = langKey;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public void setCreatedDate(Instant createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public void setLastModifiedBy(String lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
-    public void setAuthorities(Set<String> authorities) {
-        this.authorities = authorities;
     }
 
     public String getCreatedBy() {
         return createdBy;
     }
 
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
     public Instant getCreatedDate() {
         return createdDate;
     }
 
+    public void setCreatedDate(Instant createdDate) {
+        this.createdDate = createdDate;
+    }
+
     public String getLastModifiedBy() {
         return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
     }
 
     public Instant getLastModifiedDate() {
@@ -218,6 +216,18 @@ public class UserDTO {
         return authorities;
     }
 
+    public void setAuthorities(Set<String> authorities) {
+        this.authorities = authorities;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
     @Override
     public String toString() {
         return "UserDTO{" +
@@ -225,7 +235,6 @@ public class UserDTO {
             ", firstName='" + firstName + '\'' +
             ", lastName='" + lastName + '\'' +
             ", email='" + email + '\'' +
-            ", imageUrl='" + imageUrl + '\'' +
             ", activated=" + activated +
             ", langKey='" + langKey + '\'' +
             ", createdBy=" + createdBy +

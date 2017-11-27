@@ -19,7 +19,7 @@ eureka:
         #hostname: 10.17.50.77
     client:
         service-url:
-            defaultZone: http://admin:admin@10.17.33.240:8761/eureka/ #${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE} #http://admin:admin@localhost:8761/eureka/
+            defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE} # http://admin:admin@10.17.33.240:8761/eureka/
 
 spring:
     profiles:
@@ -84,10 +84,14 @@ spring:
                     environment:
                         spring:
                             rabbitmq:
-                                host: 10.17.33.240
-                                port: 5672
-                                username: guest
-                                passowrd: guest
+                                addresses: elephant.rmq.cloudamqp.com
+                                username: dxikxozh
+                                password: qbTbnhBbUkz5F0WIKjKR602qitA8vNT5
+                                virtual-host: dxikxozh
+                                #host: 10.17.33.240
+                                #port: 5672
+                                #username: guest
+                                #password: guest
 
 liquibase:
     contexts: dev

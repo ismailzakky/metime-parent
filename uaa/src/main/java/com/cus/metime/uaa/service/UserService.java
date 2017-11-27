@@ -1,20 +1,28 @@
 package com.cus.metime.uaa.service;
 
+import com.cloudinary.Cloudinary;
 import com.cus.metime.shared.messaging.MessageEvent;
+import com.cus.metime.shared.services.CloudinaryFileHandling;
 import com.cus.metime.shared.util.RandomString;
 import com.cus.metime.uaa.assembler.UserToUserDTOAssembler;
 import com.cus.metime.uaa.config.Constants;
 import com.cus.metime.uaa.domain.Authority;
+import com.cus.metime.uaa.domain.CloudinaryImage;
 import com.cus.metime.uaa.domain.User;
 import com.cus.metime.uaa.domain.builder.UserBuilder;
+import com.cus.metime.uaa.dto.CloudinaryImageDTO;
+import com.cus.metime.uaa.dto.builder.CloudinaryImageDTOBuilder;
 import com.cus.metime.uaa.repository.AuthorityRepository;
 import com.cus.metime.uaa.repository.UserRepository;
 import com.cus.metime.shared.security.uaa.AuthoritiesConstants;
+import com.cus.metime.uaa.rest.param.UpdateProfileParam;
 import com.cus.metime.uaa.security.SecurityUtils;
 import com.cus.metime.uaa.service.dto.UserDTO;
 import com.cus.metime.uaa.service.util.RandomUtil;
 import org.slf4j.Logger;
+import com.cloudinary.*;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -48,6 +56,9 @@ public class UserService {
     private final AssyncMessagingService assyncMessagingService;
 
     private final UserToUserDTOAssembler userToUserDTOAssembler;
+
+    @Value("${cloudinary.url}")
+    private String cloudinaryConnectionString;
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository, UserToUserDTOAssembler userToUserDTOAssembler, AssyncMessagingService assyncMessagingService) {
         this.userRepository = userRepository;
@@ -105,7 +116,7 @@ public class UserService {
         newUser.setFirstName(firstName);
         newUser.setLastName(lastName);
         newUser.setEmail(email);
-        newUser.setImageUrl(imageUrl);
+        newUser.setCloudinaryImage(null);
         newUser.setLangKey(langKey);
         // new user is not active
         newUser.setActivated(false);
@@ -124,7 +135,7 @@ public class UserService {
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
         user.setEmail(userDTO.getEmail());
-        user.setImageUrl(userDTO.getImageUrl());
+        user.setCloudinaryImage(userDTO.getCloudinaryImage());
         user.setUuid(UUID.randomUUID().toString());
         if (userDTO.getLangKey() == null) {
             user.setLangKey("en"); // default language
@@ -157,13 +168,13 @@ public class UserService {
      * @param langKey language key
      * @param imageUrl image URL of user
      */
-    public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl) {
+    public void updateUser(String firstName, String lastName, String email, String langKey, CloudinaryImage imageUrl) {
         userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).ifPresent(user -> {
             user.setFirstName(firstName);
             user.setLastName(lastName);
             user.setEmail(email);
             user.setLangKey(langKey);
-            user.setImageUrl(imageUrl);
+            user.setCloudinaryImage(imageUrl);
             log.debug("Changed Information for User: {}", user);
         });
     }
@@ -182,7 +193,7 @@ public class UserService {
                 user.setFirstName(userDTO.getFirstName());
                 user.setLastName(userDTO.getLastName());
                 user.setEmail(userDTO.getEmail());
-                user.setImageUrl(userDTO.getImageUrl());
+                user.setCloudinaryImage(userDTO.getCloudinaryImage());
                 user.setActivated(userDTO.isActivated());
                 user.setLangKey(userDTO.getLangKey());
                 Set<Authority> managedAuthorities = user.getAuthorities();
@@ -196,34 +207,28 @@ public class UserService {
             .map(UserDTO::new);
     }
 
-    public Optional<UserDTO> updateUserImage(UserDTO userDTO, MultipartFile multipartFile, Boolean userChangeSubmited) throws IOException {
-
-        Boolean successSaving = false;
-        Optional<UserDTO> updatedUserDTO = null;
-        if(userChangeSubmited){
-            updatedUserDTO = updateUser(userDTO);
-        }
-
-        if(updatedUserDTO.isPresent()){
-            RandomString randomString = new RandomString(10, ThreadLocalRandom.current());
-            String fileName = randomString.nextString();
-            updatedUserDTO.get().setImageUrl(fileName);
-
-            try{
-                userRepository.save(userToUserDTOAssembler.toDomain(updatedUserDTO.get()));
-                successSaving = true;
-            } catch (Exception e){
-                successSaving = false;
-            } finally {
-                if(successSaving){
-                    assyncMessagingService.sendImageFile(multipartFile,fileName,userToUserDTOAssembler.toDomain(updatedUserDTO.get()), MessageEvent.CREATE);
-                }
-            }
-        }
-
-
-        return updatedUserDTO;
-
+    public Optional<UserDTO> updateUser(UpdateProfileParam updateProfileParam) {
+        return Optional.of(userRepository
+            .findOne(updateProfileParam.getId()))
+            .map(user -> {
+                user.setLogin(updateProfileParam.getLogin());
+                user.setFirstName(updateProfileParam.getFirstName());
+                user.setLastName(updateProfileParam.getLastName());
+                user.setEmail(updateProfileParam.getEmail());
+                user.setWebProfile(updateProfileParam.getWebProfile());
+                user.setLastName(updateProfileParam.getLastName());
+                user.setFirstName(updateProfileParam.getFirstName());
+                user.setEmail(updateProfileParam.getEmail());
+                user.setUuid(updateProfileParam.getUuid());
+                Set<Authority> managedAuthorities = user.getAuthorities();
+                managedAuthorities.clear();
+                updateProfileParam.getRoles().stream()
+                    .map(authorityRepository::findOne)
+                    .forEach(managedAuthorities::add);
+                log.debug("Changed Information for User: {}", user);
+                return user;
+            })
+            .map(UserDTO::new);
     }
 
     public void deleteUser(String login) {
@@ -283,4 +288,47 @@ public class UserService {
     }
 
 
+    @Transactional
+    public User updateUserPhoto(User user, MultipartFile multipartFile) {
+
+        CloudinaryFileHandling cloudinaryFileHandling = new CloudinaryFileHandling(cloudinaryConnectionString);
+        Boolean successUpload = false;
+        CloudinaryImageDTO cloudinaryImageDTO = null;
+        try {
+
+            if(user.getCloudinaryImage() != null){
+                cloudinaryFileHandling.deleteImage(user.getCloudinaryImage().getPublicId());
+            }
+
+            Map resultMap = cloudinaryFileHandling.uploadIMage(multipartFile);
+            Integer version = (Integer) resultMap.get("version");
+            cloudinaryImageDTO = new CloudinaryImageDTOBuilder()
+                .setPublicId((String) resultMap.get("public_id"))
+                .setVersion(version.toString())
+                .setSignature((String) resultMap.get("signature"))
+                .setWidth(Float.parseFloat(  String.valueOf((Integer) resultMap.get("width"))))
+                .setHeight(Float.parseFloat(   String.valueOf((Integer) resultMap.get("height"))))
+                .setFormat((String) resultMap.get("format"))
+                .setResourceType((String) resultMap.get("resource_type"))
+                .setBytes(Long.parseLong(String.valueOf((Integer) resultMap.get("bytes"))))
+                .setType((String) resultMap.get("type"))
+                .setUrl((String) resultMap.get("url"))
+                .setSecureUrl((String) resultMap.get("secure_url"))
+                .setEtag((String)resultMap.get("etag"))
+                .createCloudinaryImageDTO();
+            successUpload = true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(successUpload){
+                user.setCloudinaryImage(cloudinaryImageDTO);
+                userRepository.save(user);
+            }
+        }
+        return user;
+    }
+
+    public void saveNewSalonManager(User user, String salonId) {
+        userRepository.save(user);
+    }
 }

@@ -11,6 +11,7 @@ import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -51,7 +52,12 @@ public class PromoResource {
     public ResponseEntity<Promo> createPromo(@RequestParam("param") String param, @RequestParam("file") MultipartFile file) throws URISyntaxException, IOException {
 
 
+
         PromoDTO promoDTO = new ObjectMapper().readValue(param, PromoDTO.class);
+
+        if( StringUtils.isEmpty(promoDTO.getPromoCategory().toString()) || promoDTO.getValidityPeriodDTO().getEndDate() == null || promoDTO.getValidityPeriodDTO().getStartDate() == null || StringUtils.isEmpty(promoDTO.getSegment())  ){
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "invalid parameter", "Invalid param Parameter Format")).body(null);
+        }
         log.debug("REST request to save Promo : {}", promoDTO);
         if (promoDTO.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new promo cannot already have an ID")).body(null);
@@ -76,6 +82,11 @@ public class PromoResource {
     @Timed
     public ResponseEntity<Promo> updatePromo(@RequestBody PromoDTO promoDTO) throws URISyntaxException {
         log.debug("REST request to update Promo : {}", promoDTO);
+
+        if( StringUtils.isEmpty(promoDTO.getPromoCategory().toString()) || promoDTO.getValidityPeriodDTO().getEndDate() == null || promoDTO.getValidityPeriodDTO().getStartDate() == null || StringUtils.isEmpty(promoDTO.getSegment())  || StringUtils.isEmpty(promoDTO.getId()) || StringUtils.isEmpty(promoDTO.getUuid()) ){
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "invalid parameter", "Invalid param Parameter Format")).body(null);
+        }
+
         Promo promo = promoService.findOne(promoDTO.getId());
         if (promoDTO.getId() == null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "notexist", "selected promo is'nt exist")).body(null);
@@ -134,6 +145,15 @@ public class PromoResource {
     @DeleteMapping("/promo/{id}")
     @Timed
     public ResponseEntity<Void> deletePromo(@PathVariable Long id) {
+        try {
+            if( id == null || StringUtils.isEmpty(id.toString() )){
+                return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "invalid parameter", "Invalid param Parameter Format")).body(null);
+            }
+        } catch (NullPointerException e){
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "invalid parameter", "Invalid param Parameter Format")).body(null);
+
+        }
+
         log.debug("REST request to delete Promo : {}", id);
         promoService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();

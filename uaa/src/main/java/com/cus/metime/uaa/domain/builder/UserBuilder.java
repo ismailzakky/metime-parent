@@ -1,31 +1,27 @@
 package com.cus.metime.uaa.domain.builder;
 
 import com.cus.metime.uaa.domain.Authority;
+import com.cus.metime.uaa.domain.CloudinaryImage;
 import com.cus.metime.uaa.domain.User;
 
 import java.time.Instant;
 import java.util.Set;
 
 public class UserBuilder {
-    private Long id;
     private String uuid;
     private String login;
     private String password;
     private String firstName;
     private String lastName;
     private String email;
+    private String webProfile;
     private boolean activated;
     private String langKey;
-    private String imageUrl;
+    private CloudinaryImage cloudinaryImage;
     private String activationKey;
     private String resetKey;
     private Instant resetDate;
     private Set<Authority> authorities;
-
-    public UserBuilder setId(Long id) {
-        this.id = id;
-        return this;
-    }
 
     public UserBuilder setUuid(String uuid) {
         this.uuid = uuid;
@@ -57,6 +53,11 @@ public class UserBuilder {
         return this;
     }
 
+    public UserBuilder setWebProfile(String webProfile) {
+        this.webProfile = webProfile;
+        return this;
+    }
+
     public UserBuilder setActivated(boolean activated) {
         this.activated = activated;
         return this;
@@ -67,8 +68,8 @@ public class UserBuilder {
         return this;
     }
 
-    public UserBuilder setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public UserBuilder setCloudinaryImage(CloudinaryImage cloudinaryImage) {
+        this.cloudinaryImage = cloudinaryImage;
         return this;
     }
 
@@ -93,6 +94,6 @@ public class UserBuilder {
     }
 
     public User createUser() {
-        return new User(id, uuid, login, password, firstName, lastName, email, activated, langKey, imageUrl, activationKey, resetKey, resetDate, authorities);
+        return new User(uuid, login, password, firstName, lastName, email, webProfile, activated, langKey, cloudinaryImage, activationKey, resetKey, resetDate, authorities);
     }
 }

@@ -42,8 +42,10 @@ public class Promo implements Serializable {
     @Column(name = "uuid")
     private String uuid;
 
-    @OneToOne
+    @Embedded
     private CloudinaryImage cloudinaryImage;
+
+    private Boolean deleted;
 
 
     public Promo() {

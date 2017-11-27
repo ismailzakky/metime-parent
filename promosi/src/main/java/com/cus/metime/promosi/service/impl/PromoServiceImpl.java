@@ -18,9 +18,12 @@ import com.cloudinary.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import sun.plugin2.message.EventMessage;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -46,6 +49,8 @@ public class PromoServiceImpl implements PromoService{
     private PromoAssembler promoAssembler;
     @Autowired
     private AssyncMessagingService assyncMessagingService;
+    @Value("${cloudinary}")
+    private String cloudinaryConnectionString;
 
 
     /**
@@ -64,7 +69,7 @@ public class PromoServiceImpl implements PromoService{
         boolean successUpload = false;
         Promo savedPromo = null;
 
-        CloudinaryFileHandling cloudinaryFileHandling = new CloudinaryFileHandling("me-time","947139922155272","UxefH95eO8rFMj9O-VaK923RrQg");
+        CloudinaryFileHandling cloudinaryFileHandling = new CloudinaryFileHandling(cloudinaryConnectionString);
         if(promoDTO.getPromoCategory() == PromoCategory.CUSTOM){
             try{
                 Map resultMap = cloudinaryFileHandling.uploadIMage(file);
@@ -82,7 +87,6 @@ public class PromoServiceImpl implements PromoService{
                         .setSecureUrl((String) resultMap.get("secure_url"))
                         .setEtag((String)resultMap.get("etag"))
                         .createCloudinaryImageDTO();
-
                 promoDTO.setCloudinaryImageDTO(cloudinaryImageDTO);
                 successUpload = true;
             } catch (Exception e){
@@ -96,14 +100,12 @@ public class PromoServiceImpl implements PromoService{
         } else {
             try {
                 savedPromo = promoRepository.save(promoAssembler.toDomain(promoDTO));
+                assyncMessagingService.sendIndexMessage(MessageEvent.CREATE,savedPromo);
             } catch (Exception e){
                 e.printStackTrace();
                 savedPromo = null;
             }
         }
-
-
-
         return savedPromo;
     }
 
@@ -150,7 +152,7 @@ public class PromoServiceImpl implements PromoService{
         log.debug("Request to delete Promo : {}", id);
         Promo currentPromo = null;
         boolean success = false;
-        CloudinaryFileHandling cloudinaryFileHandling = new CloudinaryFileHandling("me-time","947139922155272","UxefH95eO8rFMj9O-VaK923RrQg");
+        CloudinaryFileHandling cloudinaryFileHandling = new CloudinaryFileHandling(cloudinaryConnectionString);
         try{
             currentPromo = promoRepository.findOne(id);
             promoRepository.delete(id);
@@ -161,6 +163,7 @@ public class PromoServiceImpl implements PromoService{
         } finally {
             if(success){
                 try {
+                    assyncMessagingService.sendIndexMessage(MessageEvent.DELETE,currentPromo);
                     cloudinaryFileHandling.deleteImage(currentPromo.getCloudinaryImage().getPublicId());
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -192,6 +195,10 @@ public class PromoServiceImpl implements PromoService{
         } catch(Exception e){
             log.debug("failed to update promo",promo);
             e.printStackTrace();
+        } finally {
+            if(success){
+                assyncMessagingService.sendIndexMessage(MessageEvent.UPDATE,promo);
+            }
         }
 
         return promo;

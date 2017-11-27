@@ -1,26 +1,46 @@
-package com.cus.metime.promosi.domain;
+package com.cus.metime.uaa.domain;
 
-import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.*;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 
 @Embeddable
 public class CloudinaryImage implements Serializable{
 
+    @Column(unique = true)
     private String publicId;
+
+    @GenericGenerator(name = "generator" , strategy = "foreign",parameters = @org.hibernate.annotations.Parameter(name = "id" ,value = "image"))
+    private Long foreignID;
+
+
+    @Size(max = 50)
     private String version;
+    @Size(max = 50)
     private String signature;
+    @DecimalMin("0.00")
     private Float width;
+    @DecimalMin("0.00")
     private Float height;
+    @Size(max = 50)
     private String format;
+    @Size(max = 50)
     private String resourceType;
     private Date createdAt;
     private Long bytes;
+    @Size(max = 50)
     private String type;
+    @Size(max = 50)
     private String url;
+    @Size(max = 50)
     private String secureUrl;
+    @Size(max = 50)
     private String etag;
 
     public CloudinaryImage() {
@@ -47,6 +67,15 @@ public class CloudinaryImage implements Serializable{
 
         return publicId;
     }
+
+    public Long getForeignID() {
+        return foreignID;
+    }
+
+    public void setForeignID(Long foreignID) {
+        this.foreignID = foreignID;
+    }
+
 
     public void setPublicId(String publicId) {
         this.publicId = publicId;

@@ -1,21 +1,21 @@
 package com.cus.metime.uaa.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.cus.metime.shared.security.uaa.AuthoritiesConstants;
 import com.cus.metime.uaa.config.Constants;
 import com.cus.metime.uaa.domain.User;
 import com.cus.metime.uaa.repository.UserRepository;
-import com.cus.metime.shared.security.uaa.AuthoritiesConstants;
-import com.cus.metime.uaa.service.MailService;
-import com.cus.metime.uaa.service.UserService;
-import com.cus.metime.uaa.service.dto.UserDTO;
+import com.cus.metime.uaa.rest.param.UpdateProfileParam;
 import com.cus.metime.uaa.rest.util.HeaderUtil;
 import com.cus.metime.uaa.rest.util.PaginationUtil;
 import com.cus.metime.uaa.rest.vm.ManagedUserVM;
+import com.cus.metime.uaa.service.MailService;
+import com.cus.metime.uaa.service.UserService;
+import com.cus.metime.uaa.service.dto.UserDTO;
 import io.github.jhipster.web.util.ResponseUtil;
 import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -70,8 +69,7 @@ public class UserResource {
 
     private final UserService userService;
 
-    public UserResource(UserRepository userRepository, MailService mailService,
-            UserService userService) {
+    public UserResource(UserRepository userRepository, MailService mailService, UserService userService) {
 
         this.userRepository = userRepository;
         this.mailService = mailService;
@@ -124,7 +122,7 @@ public class UserResource {
      * or with status 400 (Bad Request) if the login or email is already in use,
      * or with status 500 (Internal Server Error) if the user couldn't be updated
      */
-    @PutMapping("/users")
+    /*@PutMapping("/users")
     @Timed
     public ResponseEntity<UserDTO> updateUser(@Valid @RequestBody ManagedUserVM managedUserVM) {
         log.debug("REST request to update User : {}", managedUserVM);
@@ -140,53 +138,57 @@ public class UserResource {
 
         return ResponseUtil.wrapOrNotFound(updatedUser,
             HeaderUtil.createAlert("A user is updated with identifier " + managedUserVM.getLogin(), managedUserVM.getLogin()));
-    }
-
-
-    @PutMapping("/usersImage")
-    @Timed
-    public ResponseEntity<UserDTO> updateUserProfileImage(@RequestParam("param") String param, @Valid @RequestParam("file") MultipartFile multipartFile){
-
-        Boolean userChangeSubmited = false;
-        ManagedUserVM managedUserVM = null;
-        String restMessage = "A user is upated with identifier" + managedUserVM.getLogin();
-        try{
-            managedUserVM = new ObjectMapper().readValue(param, ManagedUserVM.class);
-            userChangeSubmited = true;
-        } catch (Exception e){
-            e.printStackTrace();
-            userChangeSubmited = false;
-        }
-        Optional<UserDTO> updatedUser = null;
-        if(userChangeSubmited){
-            try {
-                updatedUser = userService.updateUserImage(managedUserVM,multipartFile,userChangeSubmited);
-            } catch (IOException e) {
-                e.printStackTrace();
-                updatedUser = null;
-                restMessage = "Update Data Failed";
-            }
-        } /*else {
-            updatedUser = userService.updateUserImage(null,multipartFile,userChangeSubmited);
-        }*/
-
-        return ResponseUtil.wrapOrNotFound(updatedUser,HeaderUtil.createAlert(restMessage, managedUserVM.getLogin()));
-
-    }
-
-/*
-    @PostMapping("/users")
-    @Timed
-    public ResponseEntity<Void> uploadImage(@RequestParam("param") String userId, @RequestParam("file") MultipartFile multipartFile){
-
-        Optional<User> currentUser = userRepository.findOneByLogin(userId);
-        User user = userService.updateUserPhoto(currentUser.get(),multipartFile);
-
-        return ResponseEntity.ok(null);
-
     }*/
 
     /**
+     * PUT  /users : Updates an existing User.
+     *
+     * @param updateProfileParam the user to update
+     * @return the ResponseEntity with status 200 (OK) and with body the updated user,
+     * or with status 400 (Bad Request) if the login or email is already in use,
+     * or with status 500 (Internal Server Error) if the user couldn't be updated
+     */
+    @PutMapping("/users")
+    @Timed
+    public ResponseEntity<UserDTO> updateUser(@Valid @RequestBody UpdateProfileParam updateProfileParam){
+
+        log.debug("REST request to update User : {}", updateProfileParam);
+
+        Optional<User> existingUser = userRepository.findOneByEmail(updateProfileParam.getEmail());
+        if (existingUser.isPresent() && (!existingUser.get().getId().equals(updateProfileParam.getId()))) {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "emailexists", "Email already in use")).body(null);
+        }
+        existingUser = userRepository.findOneByLogin(updateProfileParam.getLogin().toLowerCase());
+        if (existingUser.isPresent() && (!existingUser.get().getId().equals(updateProfileParam.getId()))) {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "userexists", "Login already in use")).body(null);
+        }
+        Optional<UserDTO> updatedUser = userService.updateUser(updateProfileParam);
+
+        return ResponseUtil.wrapOrNotFound(updatedUser,
+            HeaderUtil.createAlert("A user is updated with identifier " + updateProfileParam.getLogin(), updateProfileParam.getLogin()));
+    }
+
+
+
+    @PostMapping("/user/imageUpload")
+    @Timed
+    public ResponseEntity<User> uploadUserImage(@RequestParam("param") String userId, @RequestParam("file") MultipartFile multipartFile){
+
+        Optional<User> currentUser = Optional.ofNullable(userService.getUserWithAuthorities());
+        if(currentUser.isPresent()){
+            User user = userService.updateUserPhoto(currentUser.get(),multipartFile);
+            return new ResponseEntity<User>(user, null, HttpStatus.OK);
+        } else{
+            return ResponseUtil.wrapOrNotFound(Optional.empty(),HeaderUtil.createAlert("failed to upload image","User not found"));
+        }
+
+
+
+
+    }
+
+    /**
+
      * GET  /users : get all users.
      *
      * @param pageable the pagination information
